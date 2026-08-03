@@ -1,0 +1,226 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String?
+  role      String   @default("AGENT") // ADMIN or AGENT
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tasks     Task[]
+  viewings  Viewing[]
+  leads     Lead[]
+  passwordResetTokens PasswordResetToken[]
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique // sha256 of the raw token - the raw token only ever exists in the emailed link
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model Lead {
+  id          String   @id @default(cuid())
+  name        String
+  email       String?
+  phone       String?
+  preferredContact String? // Email, Phone, WhatsApp
+  
+  // Buyer Info
+  budget      String?
+  area        String?
+  propertyType String?
+  bedrooms    String?
+  timeline    String?
+  
+  // Lead Details
+  source      String? // Website, Referral, etc.
+  inquiryType String? // Buying, Selling, Renting, Investment, General Inquiry
+  propertyId  String? // ID of the property they inquired about
+  property    Property? @relation(fields: [propertyId], references: [id], onDelete: SetNull)
+  status      String   @default("NEW") // NEW, CONTACTED, QUALIFIED, LOST
+  leadScore   Int?
+  notes       String?
+  aiSummary   String?
+
+  assignedToId String?
+  assignedTo   User?    @relation(fields: [assignedToId], references: [id])
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  viewings    Viewing[]
+  messages    Message[]
+  tasks       Task[]
+  tags        Tag[]    @relation("LeadTags")
+
+  @@index([status])
+  @@index([createdAt])
+  @@index([assignedToId])
+  @@index([propertyId])
+}
+
+model Tag {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  color     String   @default("gray") // used for the pill color in the UI
+  createdAt DateTime @default(now())
+
+  leads     Lead[]   @relation("LeadTags")
+}
+
+model Property {
+  id          String   @id @default(cuid())
+  slug        String?  @unique // Human-readable URL slug for the public site
+  mlsId       String?  @unique // For future MLS/Resales Online integration
+  source      String   @default("MANUAL") // MANUAL, RESALES_ONLINE
+
+  title       String
+  price       String
+  secondPrice String?  // Optional second price, e.g. for a price range
+  pricePrefix String?  // e.g. "Start from"
+  status      String   @default("AVAILABLE") // AVAILABLE, RESERVED, SOLD
+  bedrooms    String?  // Free-form: "4" or a range like "2 - 4"
+  bathrooms   String?  // Free-form: "4" or a range like "2 - 4"
+  area        String?  // Built area size, digits only, e.g. "195"
+  landArea    String?  // Land area size, digits only
+  type        String?  // Comma-separated for multi-type listings, e.g. "Apartment, Penthouse"
+  community   String?
+  description String?
+  featuredImage String? // Main hero image URL, uploaded via Supabase Storage
+  images      String?  // JSON stringified array of gallery image URLs
+  videos      String?  // JSON stringified array of video URLs
+  features    String?  // JSON stringified array of feature strings
+  amenities   String?  // JSON stringified array of amenity strings
+  faqs        String?  // JSON stringified array of {question, answer}
+  isFeatured  Boolean  @default(false)
+
+  seoTitle       String? // Auto-generated on create, editable afterward
+  seoDescription String? // Auto-generated on create, editable afterward
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  viewings    Viewing[]
+  leads       Lead[]
+
+  @@index([status])
+  @@index([isFeatured])
+  @@index([createdAt])
+}
+
+model PropertyType {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+}
+
+model PropertyFeature {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+}
+
+model Viewing {
+  id          String   @id @default(cuid())
+  scheduledAt DateTime
+  status      String   @default("SCHEDULED") // SCHEDULED, COMPLETED, CANCELLED
+  
+  leadId      String
+  lead        Lead     @relation(fields: [leadId], references: [id])
+  
+  propertyId  String
+  property    Property @relation(fields: [propertyId], references: [id])
+  
+  agentId     String?
+  agent       User?    @relation(fields: [agentId], references: [id])
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([leadId])
+  @@index([propertyId])
+  @@index([agentId])
+  @@index([scheduledAt])
+}
+
+model Task {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  dueDate     DateTime?
+  status      String   @default("PENDING") // PENDING, COMPLETED
+  
+  agentId     String
+  agent       User     @relation(fields: [agentId], references: [id])
+  
+  leadId      String?
+  lead        Lead?    @relation(fields: [leadId], references: [id])
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([agentId])
+  @@index([leadId])
+  @@index([status])
+}
+
+model Message {
+  id          String   @id @default(cuid())
+  content     String
+  source      String   @default("WEB_CHAT") // WEB_CHAT, AI, CONTACT_FORM, WHATSAPP
+  isAiResponse Boolean @default(false)
+
+  leadId      String
+  lead        Lead     @relation(fields: [leadId], references: [id])
+
+  createdAt   DateTime @default(now())
+
+  @@index([leadId])
+}
+
+model BlogPost {
+  id            String   @id @default(cuid())
+  slug          String   @unique
+  title         String
+  excerpt       String?
+  content       String   // Plain text; paragraphs split on blank lines (not HTML/Markdown - not rendered as such)
+  seoMeta       String?  // JSON stringified
+  featuredImage String?
+  category      String?
+  readTime      String?
+  publishedAt   DateTime?
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Media {
+  id        String   @id @default(cuid())
+  url       String
+  path      String   // storage object path, needed to delete the file later
+  filename  String
+  mimeType  String?
+  size      Int?     // bytes
+  createdAt DateTime @default(now())
+}

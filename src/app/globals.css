@@ -1,0 +1,83 @@
+@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap');
+@import "tailwindcss";
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: ui-sans-serif, system-ui, sans-serif;
+}
+
+@theme {
+  --font-serif: "EB Garamond", serif;
+  --font-sans: "Lora", serif;
+
+  --color-bg-primary: #0a0e17;
+  --color-bg-secondary: #0f172a;
+
+  --color-medsol-blue: #173D8F;
+  --color-medsol-blue-light: #355CB8;
+
+  --color-medsol-gold: #D6B06A;
+  --color-medsol-gold-soft: #E6C892;
+
+  --color-text-primary: #F4EFE6;
+  --color-text-secondary: #B8AE9D;
+
+  --color-section-light: #F7F2EA;
+  --color-section-light-text: #1B1B1B;
+
+  --color-border-gold: rgba(214,176,106,0.35);
+}
+
+/* MEDSOL public site theme - scoped under this class so it doesn't affect
+   the /admin dashboard, which keeps the plain bg-white/text-gray-900 look. */
+.medsol-site {
+  @apply bg-bg-primary text-text-primary font-sans antialiased selection:bg-medsol-gold selection:text-bg-primary overflow-x-hidden;
+  scroll-behavior: smooth;
+}
+
+.medsol-site h1, .medsol-site h2, .medsol-site h3, .medsol-site h4, .medsol-site h5, .medsol-site h6 {
+  @apply font-serif font-light;
+}
+
+@layer utilities {
+  .text-shadow-luxury {
+    text-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  }
+
+  .bg-pattern {
+    background-image: radial-gradient(circle at 1px 1px, rgba(214, 176, 106, 0.05) 1px, transparent 0);
+    background-size: 40px 40px;
+  }
+
+  .bg-noise {
+    background-image: url("https://www.transparenttextures.com/patterns/natural-paper.png");
+  }
+
+  .mask-gradient-to-t {
+    mask-image: linear-gradient(to top, black 0%, transparent 100%);
+  }
+
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .luxury-border {
+    border-color: var(--color-border-gold);
+  }
+}
+
+.section-container {
+  @apply relative min-h-screen w-full flex flex-col justify-center py-24;
+}
+
+.max-content {
+  @apply w-full max-w-[1400px] mx-auto px-6 md:px-12 lg:px-20;
+}

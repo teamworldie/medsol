@@ -1,0 +1,1 @@
+export const VIEWING_STATUSES = ["SCHEDULED", "COMPLETED", "CANCELLED"] as const;

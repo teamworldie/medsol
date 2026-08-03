@@ -6,8 +6,17 @@ import { motion } from "motion/react";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import type { Property } from "@prisma/client";
 import InquiryForm from "@/components/site/InquiryForm";
+import type { AreaRow } from "@/lib/properties";
 
-export default function VillaDetailView({ property, gallery }: { property: Property; gallery: string[] }) {
+export default function VillaDetailView({
+  property,
+  gallery,
+  areaData,
+}: {
+  property: Property;
+  gallery: string[];
+  areaData: AreaRow[];
+}) {
   const router = useRouter();
   const galleryRef = useRef<HTMLDivElement>(null);
 
@@ -79,6 +88,16 @@ export default function VillaDetailView({ property, gallery }: { property: Prope
                   <span className="text-[10px] tracking-[0.2em] uppercase text-text-secondary block mb-2">Starting From</span>
                   <p className="text-3xl font-serif text-medsol-gold">{property.price}</p>
                 </div>
+                {property.pdfUrl && (
+                  <a
+                    href={property.pdfUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-4 bg-white text-bg-primary py-4 px-8 text-[10px] tracking-[0.2em] uppercase font-bold hover:bg-medsol-gold hover:text-white transition-all text-center"
+                  >
+                    Specs & Finishes
+                  </a>
+                )}
               </div>
             </div>
           </div>
@@ -108,6 +127,52 @@ export default function VillaDetailView({ property, gallery }: { property: Prope
                 <img src={img} alt={`${property.title} Gallery Image ${idx + 1}`} className="w-full h-full object-cover transition-transform duration-[1.5s] group-hover:scale-105" />
               </div>
             ))}
+          </div>
+        </section>
+      )}
+
+      {/* FLOORPLAN & AREAS SECTION */}
+      {(property.floorplanImage || areaData.length > 0) && (
+        <section className="py-24 relative z-10 border-b border-white/5">
+          <div className="max-content">
+            <div className="grid lg:grid-cols-12 gap-8 lg:gap-16 items-start min-w-0">
+              {property.floorplanImage && (
+                <div className={`col-span-12 ${areaData.length > 0 ? "lg:col-span-7" : ""} relative`}>
+                  <div className="bg-[#e0dcd3] rounded-xl overflow-hidden shadow-2xl relative group p-4 border border-white/10">
+                    <img
+                      src={property.floorplanImage}
+                      className="w-full h-auto object-contain mix-blend-multiply opacity-90 transition-transform duration-700 group-hover:scale-105"
+                      alt={`${property.title} Floorplan`}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {areaData.length > 0 && (
+                <div className={`col-span-12 ${property.floorplanImage ? "lg:col-span-5" : ""}`}>
+                  <div className="bg-bg-secondary p-6 md:p-10 border border-white/5 h-full min-w-0 overflow-x-auto hide-scrollbar">
+                    <h3 className="text-2xl font-serif text-white mb-8">Surface Areas</h3>
+                    <div className="space-y-2">
+                      {areaData.map((row, idx) => (
+                        <div
+                          key={idx}
+                          className={`flex justify-between items-center py-2 ${
+                            row.type === "header"
+                              ? "text-medsol-gold font-bold text-[10px] tracking-[0.2em] uppercase border-b border-white/10 pb-4 mb-2 mt-4 first:mt-0"
+                              : row.type === "total"
+                                ? "text-white font-serif text-xl border-t border-white/10 pt-4 mt-4"
+                                : "text-text-secondary font-light text-sm hover:text-white transition-colors"
+                          }`}
+                        >
+                          <span>{row.label}</span>
+                          <span>{row.value}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </section>
       )}

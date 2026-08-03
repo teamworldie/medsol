@@ -1,8 +1,11 @@
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import { slugify } from './src/lib/slug';
+import { ensureMediaBucket, uploadPublicAsset } from './src/lib/uploadAsset';
 
 const prisma = new PrismaClient({});
+
+type SeedAreaRow = { label: string; value: string; type?: 'header' | 'total' | 'normal' };
 
 type SeedVilla = {
   name: string;
@@ -15,6 +18,8 @@ type SeedVilla = {
   build: string;
   gallery: string[];
   floorplanImage?: string;
+  pdfUrl?: string;
+  areaData?: SeedAreaRow[];
 };
 
 const omalaVillas: SeedVilla[] = [
@@ -38,6 +43,23 @@ const omalaVillas: SeedVilla[] = [
       '/assets/images/Omala - Villa Melissa/omala-residences-villa-melissa-vista-aerea.webp',
     ],
     floorplanImage: '/assets/images/Omala-Residences-Villa-Melissa-1200x1164.webp',
+    pdfUrl: '/assets/Omala_MemoriaCalidades_Melissa.pdf',
+    areaData: [
+      { label: 'Superficies útiles', value: 'M²', type: 'header' },
+      { label: 'Living-Dining Room-Kitchen', value: '37,50m' },
+      { label: 'Bedroom 1', value: '14,20m' },
+      { label: 'Bedroom 2', value: '10,75m' },
+      { label: 'Bedroom 3', value: '10,10m' },
+      { label: 'Bathroom 1', value: '4,00m' },
+      { label: 'Bathroom 2', value: '4,00m' },
+      { label: 'Total Usable Area', value: 'M²', type: 'header' },
+      { label: 'Porch', value: '32,85m' },
+      { label: 'Garage', value: '38,75m' },
+      { label: 'Built Surfaces', value: 'M²', type: 'header' },
+      { label: 'Dwelling 100%', value: '95,00m' },
+      { label: 'Porch 50%', value: '16,43m' },
+      { label: 'Total Plot Surface', value: '409,06m', type: 'total' },
+    ],
   },
   {
     name: 'Villa Colia',
@@ -58,6 +80,30 @@ const omalaVillas: SeedVilla[] = [
       '/assets/images/Omala - Villa Colia/omala-residences-villa-colia-vista-aerea-golf.webp',
     ],
     floorplanImage: '/assets/images/Omala-Residences-plano-colia-1200x1177.webp',
+    pdfUrl: '/assets/Omala_MemoriaCalidades_Colia.pdf',
+    areaData: [
+      { label: 'Superficies útiles', value: 'M²', type: 'header' },
+      { label: 'Living-Dining Room-Kitchen', value: '41,60m' },
+      { label: 'Hall', value: '6,20m' },
+      { label: 'Corridor', value: '4,10m' },
+      { label: 'Bedroom 1', value: '19,40m' },
+      { label: 'Bedroom 2', value: '9,70m' },
+      { label: 'Bedroom 3', value: '5,05m' },
+      { label: 'Bathroom 1', value: '5,05m' },
+      { label: 'Bathroom 2', value: '3,80m' },
+      { label: 'Laundry Room', value: '3,80m' },
+      { label: 'Guest Toilet', value: '' },
+      { label: 'Total Usable Area', value: 'M²', type: 'header' },
+      { label: 'Swimming Pool', value: '21,45m' },
+      { label: 'Porch', value: '13,70m' },
+      { label: 'Garage', value: '30,00m' },
+      { label: 'Built Surfaces', value: 'M²', type: 'header' },
+      { label: 'Dwelling 100%', value: '139,60m' },
+      { label: 'Porche 50%', value: '6,85m' },
+      { label: 'Built Home Surface', value: 'M²', type: 'header' },
+      { label: 'Garaje 50%', value: '15,00m' },
+      { label: 'Total Plot Surface', value: '791,95m', type: 'total' },
+    ],
   },
   {
     name: 'Villa Stella',
@@ -79,6 +125,29 @@ const omalaVillas: SeedVilla[] = [
       '/assets/images/Omala - Villa Stella/omala-residences-villa-stella-fachada-puerta-principal.webp',
     ],
     floorplanImage: '/assets/images/Omala-Residences-Plano-Stella-1200x1205.webp',
+    pdfUrl: '/assets/Omala_MemoriaCalidades_Stella.pdf',
+    areaData: [
+      { label: 'Superficies útiles', value: 'M²', type: 'header' },
+      { label: 'Salón-Comedor-Cocina', value: '41,70m' },
+      { label: 'Hallway', value: '4,50m' },
+      { label: 'Step', value: '5,70m' },
+      { label: 'Bedroom 1', value: '14,25m' },
+      { label: 'Bedroom 2', value: '9,05m' },
+      { label: 'Bedroom 3', value: '9,70m' },
+      { label: 'Bathroom 1', value: '7,70m' },
+      { label: 'Bathroom 2', value: '4,15m' },
+      { label: 'Toilet', value: '' },
+      { label: 'Total Usable Area', value: 'M²', type: 'header' },
+      { label: 'Swimming pool', value: '26,55m' },
+      { label: 'Porches', value: '28,00m' },
+      { label: 'Garage', value: '28,80m' },
+      { label: 'Built Surfaces', value: 'M²', type: 'header' },
+      { label: '100% housing', value: '132,44m' },
+      { label: 'Porch 50%', value: '14,01m' },
+      { label: 'Built Home Surface', value: 'M²', type: 'header' },
+      { label: 'Garage 50%', value: '14,40m' },
+      { label: 'Total Plot Surface', value: '729,88m', type: 'total' },
+    ],
   },
   {
     name: 'Villa Libella',
@@ -102,6 +171,30 @@ const omalaVillas: SeedVilla[] = [
       '/assets/images/Omala - Villa Libella/omala-residences-villa-libella-vestidor.webp',
     ],
     floorplanImage: '/assets/images/Plano-Libella-1200x1201.webp',
+    pdfUrl: '/assets/Omala_MemoriaCalidades_Libella.pdf',
+    areaData: [
+      { label: 'Superficies útiles', value: 'M²', type: 'header' },
+      { label: 'Living-Dining Room-Kitchen', value: '39,50m' },
+      { label: 'Hall', value: '6,10m' },
+      { label: 'Corridor', value: '4,10m' },
+      { label: 'Bedroom 1', value: '15,15m' },
+      { label: 'Bedroom 2', value: '9,75m' },
+      { label: 'Bedroom 3', value: '9,75m' },
+      { label: 'Bathroom 1', value: '4,55m' },
+      { label: 'Bathroom 2', value: '6,00m' },
+      { label: 'Laundry Room', value: '3,05m' },
+      { label: 'Guest Toilet', value: '' },
+      { label: 'Total Usable Area', value: 'M²', type: 'header' },
+      { label: 'Pool', value: '30,80m' },
+      { label: 'Porch', value: '32,90m' },
+      { label: 'Garage', value: '31,20m' },
+      { label: 'Built Surfaces', value: 'M²', type: 'header' },
+      { label: 'Dwelling 100%', value: '130,00m' },
+      { label: 'Porch 50%', value: '16,45m' },
+      { label: 'Built Home Surface', value: 'M²', type: 'header' },
+      { label: 'Garage 50%', value: '15,60m' },
+      { label: 'Total Plot Surface', value: '913,20m', type: 'total' },
+    ],
   },
   {
     name: 'Villa Antia',
@@ -122,6 +215,26 @@ const omalaVillas: SeedVilla[] = [
       '/assets/images/Omala - Villa Antia/omala-residences-villa-antia-puerta-principal.webp',
     ],
     floorplanImage: '/assets/images/omala-residences-villa-antia-1200x848.webp',
+    areaData: [
+      { label: 'Superficies útiles', value: 'M²', type: 'header' },
+      { label: 'Living-Dining Room-Kitchen', value: '55,50m' },
+      { label: 'Bedroom 1', value: '15,05m' },
+      { label: 'Bedroom 2', value: '10,30m' },
+      { label: 'Bedroom 3', value: '9,60m' },
+      { label: 'Bedroom 4', value: '9,60m' },
+      { label: 'Bathroom 1', value: '7,85m' },
+      { label: 'Bathroom 2', value: '5,05m' },
+      { label: 'Bathroom 3', value: '3,10m' },
+      { label: 'Laundry Room', value: '3,05m' },
+      { label: 'Guest Toilet', value: '' },
+      { label: 'Total Usable Area', value: 'M²', type: 'header' },
+      { label: 'Porch', value: '30,40m' },
+      { label: 'Garage', value: '30,90m' },
+      { label: 'Built Areas 214,35M²', value: 'M²', type: 'header' },
+      { label: 'Dwelling 100%', value: '178,80m' },
+      { label: 'Porch 50%', value: '35,55m' },
+      { label: 'Total Plot Surface', value: '700m²', type: 'total' },
+    ],
   },
 ];
 
@@ -215,6 +328,14 @@ const corveraVillas: SeedVilla[] = [
       '/assets/images/Corvera - Olea Villas/VILLAS OLEA_vista aerea 2.webp',
     ],
     floorplanImage: '/assets/images/olea general plan.webp',
+    areaData: [
+      { label: 'Built Area', value: '119.21 - 143.13 m²', type: 'header' },
+      { label: 'Plot Area', value: '422.10 - 501.95 m²' },
+      { label: 'Garden', value: '136.16 - 165.79 m²' },
+      { label: 'Terraces', value: '90.63 - 104.28 m²' },
+      { label: 'Solarium', value: '54.66 - 78.18 m²' },
+      { label: 'Completion', value: 'Sept. 2027', type: 'total' },
+    ],
   },
   {
     name: 'Aneas Villas',
@@ -237,6 +358,14 @@ const corveraVillas: SeedVilla[] = [
       '/assets/images/Corvera - Aneas Villas/Aneas_aerea.webp',
     ],
     floorplanImage: '/assets/images/aneas villas.webp',
+    areaData: [
+      { label: 'Built Area', value: '115.35 - 117.47 m²', type: 'header' },
+      { label: 'Plot Area', value: '249.70 - 401.78 m²' },
+      { label: 'Garden', value: '88.87 - 148.27 m²' },
+      { label: 'Terraces', value: '33.95 - 35.15 m²' },
+      { label: 'Solarium', value: '46.74 - 47.54 m²' },
+      { label: 'Completion', value: 'Nov. 2027', type: 'total' },
+    ],
   },
   {
     name: 'Aneas Apartments',
@@ -259,6 +388,13 @@ const corveraVillas: SeedVilla[] = [
       '/assets/images/Corvera - Aneas Apartments/Aneas_aerea.webp',
     ],
     floorplanImage: '/assets/images/Aneas apartments plan.webp',
+    areaData: [
+      { label: 'Built Area', value: '73.68 - 103.29 m²', type: 'header' },
+      { label: 'Terrace', value: '15.03 - 124.57 m²' },
+      { label: 'Solarium (Top Floors)', value: '48.66 - 68.56 m²' },
+      { label: 'Storage Room', value: '14.24 - 20.46 m²' },
+      { label: 'Completion', value: 'Jan. 2028', type: 'total' },
+    ],
   },
 ];
 
@@ -268,11 +404,30 @@ const resorts: { community: string; villas: SeedVilla[] }[] = [
   { community: 'Corvera Hills', villas: corveraVillas },
 ];
 
+// Uploads each local asset once and reuses the result if the same file path
+// appears more than once for a villa (e.g. the hero image also appears in
+// the gallery).
+async function uploadWithCache(localPath: string, cache: Map<string, string>): Promise<string> {
+  const cached = cache.get(localPath);
+  if (cached) return cached;
+  const url = await uploadPublicAsset(localPath);
+  cache.set(localPath, url);
+  return url;
+}
+
 async function seedProperties() {
+  await ensureMediaBucket();
+  const uploadCache = new Map<string, string>();
+
   for (const { community, villas } of resorts) {
     for (const [index, villa] of villas.entries()) {
+      console.log(`Uploading assets for ${villa.name}...`);
       const slug = slugify(villa.name);
-      const images = villa.floorplanImage ? [...villa.gallery, villa.floorplanImage] : villa.gallery;
+
+      const featuredImage = await uploadWithCache(villa.image, uploadCache);
+      const galleryUrls = await Promise.all(villa.gallery.map((img) => uploadWithCache(img, uploadCache)));
+      const floorplanImage = villa.floorplanImage ? await uploadWithCache(villa.floorplanImage, uploadCache) : null;
+      const pdfUrl = villa.pdfUrl ? await uploadWithCache(villa.pdfUrl, uploadCache) : null;
 
       await prisma.property.upsert({
         where: { slug },
@@ -288,8 +443,11 @@ async function seedProperties() {
           area: villa.build,
           landArea: villa.plot,
           community,
-          featuredImage: villa.image,
-          images: JSON.stringify(images),
+          featuredImage,
+          images: JSON.stringify(galleryUrls),
+          floorplanImage,
+          pdfUrl,
+          areaData: villa.areaData ? JSON.stringify(villa.areaData) : null,
           isFeatured: index === 0,
           seoTitle: `${villa.name} | ${community} | Medsol Real Estate`,
           seoDescription: villa.description.slice(0, 155),
@@ -315,6 +473,13 @@ async function main() {
     },
   });
   console.log('Seeded Admin user:', user);
+
+  if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    throw new Error(
+      'SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must be set in .env before seeding properties - ' +
+        'they are required to upload villa images/PDFs to Supabase Storage.'
+    );
+  }
 
   await seedProperties();
 }

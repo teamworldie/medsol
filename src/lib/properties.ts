@@ -17,6 +17,17 @@ export function getGallery(property: Property): string[] {
   }
 }
 
+export type AreaRow = { label: string; value: string; type?: "header" | "total" | "normal" };
+
+export function getAreaData(property: Property): AreaRow[] {
+  if (!property.areaData) return [];
+  try {
+    return JSON.parse(property.areaData) as AreaRow[];
+  } catch {
+    return [];
+  }
+}
+
 export async function getPropertiesByCommunity(community: string) {
   return prisma.property.findMany({
     where: { community },

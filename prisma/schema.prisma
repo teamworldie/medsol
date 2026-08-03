@@ -113,6 +113,9 @@ model Property {
   features    String?  // JSON stringified array of feature strings
   amenities   String?  // JSON stringified array of amenity strings
   faqs        String?  // JSON stringified array of {question, answer}
+  floorplanImage String? // Floorplan image URL
+  pdfUrl      String?  // Specs/brochure PDF URL
+  areaData    String?  // JSON stringified array of {label, value, type}
   isFeatured  Boolean  @default(false)
 
   seoTitle       String? // Auto-generated on create, editable afterward

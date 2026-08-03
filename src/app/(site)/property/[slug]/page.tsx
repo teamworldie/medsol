@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getPropertyBySlug, getGallery } from "@/lib/properties";
+import { getPropertyBySlug, getGallery, getAreaData } from "@/lib/properties";
 import Footer from "@/components/site/Footer";
 import VillaDetailView from "./VillaDetailView";
 
@@ -25,10 +25,11 @@ export default async function PropertyPage({ params }: { params: Promise<{ slug:
   }
 
   const gallery = getGallery(property);
+  const areaData = getAreaData(property);
 
   return (
     <main className="bg-bg-primary overflow-x-hidden">
-      <VillaDetailView property={property} gallery={gallery} />
+      <VillaDetailView property={property} gallery={gallery} areaData={areaData} />
       <Footer tagline="MEDSOL · Luxury Real Estate." />
     </main>
   );

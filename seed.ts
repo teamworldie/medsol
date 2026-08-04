@@ -2,6 +2,7 @@ import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import { slugify } from './src/lib/slug';
 import { ensureMediaBucket, uploadPublicAsset } from './src/lib/uploadAsset';
+import { calculateReadTime } from './src/lib/readTime';
 
 const prisma = new PrismaClient({});
 
@@ -458,6 +459,48 @@ async function seedProperties() {
   console.log('Seeded properties for Omala, Alhama and Corvera.');
 }
 
+async function seedJournal() {
+  const title = 'Why Murcia Is Becoming the Mediterranean’s Best-Kept Secret';
+  const slug = slugify(title);
+  const content = `For decades, buyers chasing the Mediterranean dream looked first to the Costa del Sol or the Balearics. Murcia stayed quietly in the background — golf courses, orchards, and a coastline that never quite made the glossy brochures. That is changing fast, and for good reason.
+
+## A Climate That Works Year-Round
+
+Murcia enjoys over 300 days of sunshine a year, with milder, drier summers than much of the southern coast. It is the kind of climate that rewards early risers on the golf course and long lunches on a shaded terrace in equal measure — a genuine four-season lifestyle rather than a July-and-August rush.
+
+## Space, Without the Price Tag of Marbella
+
+What sets communities like Omala Residences and Alhama Nature apart is scale: plot sizes that would be unthinkable further along the coast, at a fraction of the price per square metre. Buyers are discovering that the amplitude they once associated with far more expensive postcodes is available here, without compromising on architecture or finish quality.
+
+## Golf, Nature, and a Genuine Community
+
+Alhama Nature's Jack Nicklaus-designed course and the Sierra de Espuña on its doorstep give the region a rare combination: championship golf minutes from genuine hiking trails and protected mountain landscape. Corvera Hills, meanwhile, is drawing a growing international community who want more than a holiday home — they want a second life, built around the golf club, the local markets, and neighbours who become friends.
+
+## Connectivity Is No Longer a Trade-Off
+
+Murcia International Airport has transformed the calculus for international buyers. What used to mean a long transfer from Alicante or Almería is now a fifteen-minute drive from Omala Residences, with direct and connecting flights across Europe expanding every season.
+
+## The Takeaway
+
+Murcia is not a discount version of better-known Spanish coastlines — it is its own proposition: more space, a genuinely liveable climate, serious golf, and a community still forming rather than fully priced in. For buyers who got in early on the Costa del Sol two decades ago, this is starting to feel familiar.`;
+
+  await prisma.blogPost.upsert({
+    where: { slug },
+    update: {},
+    create: {
+      slug,
+      title,
+      excerpt:
+        'Space, sunshine, and championship golf at a fraction of the price of better-known coastlines — why international buyers are discovering Murcia.',
+      content,
+      category: 'Market Insights',
+      readTime: calculateReadTime(content),
+      publishedAt: new Date(),
+    },
+  });
+  console.log('Seeded sample journal post.');
+}
+
 async function main() {
   // Change this password (and rotate it after first login) before deploying.
   const hashedPassword = await bcrypt.hash('admin123', 10);
@@ -482,6 +525,7 @@ async function main() {
   }
 
   await seedProperties();
+  await seedJournal();
 }
 
 main()

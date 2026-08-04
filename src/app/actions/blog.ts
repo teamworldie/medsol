@@ -65,7 +65,7 @@ export async function createBlogPost(prevState: unknown, formData: FormData) {
   }
 
   revalidatePath("/admin/blog");
-  revalidatePath("/blog");
+  revalidatePath("/journal");
   redirect("/admin/blog");
 }
 
@@ -80,7 +80,7 @@ export async function updateBlogPost(id: string, prevState: unknown, formData: F
   await prisma.blogPost.update({ where: { id }, data: { ...parsed.data, publishedAt } });
 
   revalidatePath("/admin/blog");
-  revalidatePath("/blog");
+  revalidatePath("/journal");
   redirect("/admin/blog");
 }
 
@@ -89,5 +89,5 @@ export async function deleteBlogPost(id: string) {
   await prisma.blogPost.delete({ where: { id } });
 
   revalidatePath("/admin/blog");
-  revalidatePath("/blog");
+  revalidatePath("/journal");
 }

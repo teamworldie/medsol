@@ -11,6 +11,7 @@ const links = [
   { href: "/omala-residences", label: "OMALA" },
   { href: "/alhama-nature", label: "ALHAMA" },
   { href: "/corvera", label: "CORVERA" },
+  { href: "/journal", label: "JOURNAL" },
   { href: "/contact", label: "CONTACT" },
 ];
 

@@ -20,7 +20,7 @@ export default function ClientLoginForm() {
             type="email"
             autoComplete="email"
             required
-            className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm text-gray-900 bg-white"
+            className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-medsol-blue focus:border-medsol-blue sm:text-sm text-gray-900 bg-white"
           />
         </div>
       </div>
@@ -36,7 +36,7 @@ export default function ClientLoginForm() {
             type="password"
             autoComplete="current-password"
             required
-            className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm text-gray-900 bg-white"
+            className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-medsol-blue focus:border-medsol-blue sm:text-sm text-gray-900 bg-white"
           />
         </div>
       </div>
@@ -67,7 +67,7 @@ function LoginButton() {
     <button
       type="submit"
       disabled={pending}
-      className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gray-900 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+      className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-medsol-blue hover:bg-medsol-blue-light focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-medsol-blue disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
     >
       {pending ? "Signing in..." : "Sign in"}
     </button>

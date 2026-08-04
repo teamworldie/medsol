@@ -11,9 +11,9 @@ export default function SidebarItem({ href, icon, label }: { href: string; icon:
     <Link 
       href={href}
       className={`flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-md transition-colors ${
-        isActive 
-          ? "bg-gray-100 text-gray-900" 
-          : "text-gray-700 hover:bg-gray-50 hover:text-gray-900"
+        isActive
+          ? "bg-medsol-blue text-white"
+          : "text-gray-700 hover:bg-medsol-blue/5 hover:text-medsol-blue"
       }`}
     >
       {icon}

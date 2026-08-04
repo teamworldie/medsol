@@ -42,8 +42,9 @@ export default function AdminShell({
           mobileOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <div className="h-16 flex items-center justify-between px-6 border-b border-gray-200">
-          <span className="font-serif text-lg font-bold tracking-wide text-gray-900">Admin Portal</span>
+        <div className="h-16 flex items-center justify-between px-6 border-b-2 border-medsol-gold">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/assets/images/medsol-logo-light.webp" alt="Medsol" className="h-7 w-auto invert" />
           <button
             type="button"
             onClick={() => setMobileOpen(false)}
@@ -71,7 +72,7 @@ export default function AdminShell({
 
         <div className="p-4 border-t border-gray-200">
           <div className="flex items-center gap-3 mb-4 px-2">
-            <div className="w-8 h-8 rounded-full bg-gray-900 text-white flex items-center justify-center font-bold text-sm">
+            <div className="w-8 h-8 rounded-full bg-medsol-blue text-white flex items-center justify-center font-bold text-sm">
               {user.name?.charAt(0) || "A"}
             </div>
             <div className="flex-1 min-w-0">
@@ -101,7 +102,7 @@ export default function AdminShell({
             <Menu size={24} />
           </button>
           <div className="flex items-center gap-4">
-            <Link href="/" target="_blank" className="text-sm text-gray-500 hover:text-gray-900">
+            <Link href="/" target="_blank" className="text-sm text-gray-500 hover:text-medsol-blue transition-colors">
               View Website ↗
             </Link>
           </div>

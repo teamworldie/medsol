@@ -1,6 +1,9 @@
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 import Navbar from "@/components/site/Navbar";
 import PageTransition from "@/components/site/PageTransition";
+
+const GA_MEASUREMENT_ID = "G-Q3ZQJ5MH7T";
 
 export const viewport: Viewport = {
   themeColor: "#0a0e17",
@@ -55,6 +58,15 @@ export const metadata: Metadata = {
 export default function SiteLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="medsol-site">
+      <Script src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`} strategy="afterInteractive" />
+      <Script id="google-analytics" strategy="afterInteractive">
+        {`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', '${GA_MEASUREMENT_ID}');
+        `}
+      </Script>
       <Navbar />
       <PageTransition>{children}</PageTransition>
     </div>

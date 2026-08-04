@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import LeadRowActions from "./LeadRowActions";
 import LeadDetailModal from "./LeadDetailModal";
@@ -25,8 +26,10 @@ type LeadRow = {
   leadScore: number | null;
   notes: string | null;
   aiSummary: string | null;
+  lastContactedAt: Date | null;
   createdAt: Date;
   tags: { id: string; name: string; color: string }[];
+  leadNotes: { id: string; content: string; createdAt: Date }[];
 };
 
 export default async function LeadsPage({
@@ -48,7 +51,7 @@ export default async function LeadsPage({
       prisma.lead.findMany({
         where,
         orderBy: { createdAt: "desc" },
-        include: { tags: true },
+        include: { tags: true, leadNotes: { orderBy: { createdAt: "desc" } } },
         skip: (page - 1) * PAGE_SIZE,
         take: PAGE_SIZE,
       }),
@@ -72,6 +75,8 @@ export default async function LeadsPage({
       leadScore: null,
       notes: null,
       aiSummary: null,
+      lastContactedAt: null,
+      leadNotes: [],
     };
     leads = [
       { id: "1", name: "Alice Johnson", email: "alice@example.com", phone: "+420 123 456 789", source: "CONTACT_FORM", status: "NEW", createdAt: new Date(now), tags: [], ...emptyLeadDetails },
@@ -91,7 +96,15 @@ export default async function LeadsPage({
           <h1 className="text-2xl font-bold text-gray-900">Leads</h1>
           <p className="text-gray-500 mt-1">Manage all your incoming inquiries and contacts.</p>
         </div>
-        <SegmentFilter tags={allTags} activeTag={tag ?? null} />
+        <div className="flex items-center gap-4">
+          <SegmentFilter tags={allTags} activeTag={tag ?? null} />
+          <Link
+            href="/admin/leads/new"
+            className="rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 transition-colors whitespace-nowrap"
+          >
+            Add Lead
+          </Link>
+        </div>
       </div>
 
       <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
@@ -185,8 +198,14 @@ export default async function LeadsPage({
                             leadScore: lead.leadScore,
                             notes: lead.notes,
                             aiSummary: lead.aiSummary,
+                            lastContactedAt: lead.lastContactedAt ? new Date(lead.lastContactedAt).toISOString() : null,
                             createdAt: new Date(lead.createdAt).toISOString(),
                           }}
+                          leadNotes={lead.leadNotes.map((n) => ({
+                            id: n.id,
+                            content: n.content,
+                            createdAt: new Date(n.createdAt).toISOString(),
+                          }))}
                         />
                         <LeadRowActions
                           leadId={lead.id}

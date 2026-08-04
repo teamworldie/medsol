@@ -2,6 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { LEAD_STATUSES } from "@/lib/leadStatuses";
 import { requireSession } from "@/lib/authGuard";
 
@@ -68,5 +69,63 @@ export async function updateLeadStatus(leadId: string, status: string) {
   revalidatePath("/admin/leads");
   revalidatePath("/admin");
 
+  return { success: true };
+}
+
+type CreateLeadState = { error?: string } | undefined;
+
+export async function createLead(prevState: CreateLeadState, formData: FormData): Promise<CreateLeadState> {
+  await requireSession();
+
+  const name = (formData.get("name") as string)?.trim();
+  if (!name) {
+    return { error: "Name is required." };
+  }
+
+  const email = (formData.get("email") as string) || null;
+  if (email && !EMAIL_RE.test(email)) {
+    return { error: "Please enter a valid email address." };
+  }
+
+  await prisma.lead.create({
+    data: {
+      name,
+      email,
+      phone: (formData.get("phone") as string) || null,
+      preferredContact: (formData.get("preferredContact") as string) || null,
+      source: (formData.get("source") as string) || "MANUAL",
+      inquiryType: (formData.get("inquiryType") as string) || null,
+      propertyId: (formData.get("propertyId") as string) || null,
+      status: (formData.get("status") as string) || "NEW",
+      notes: (formData.get("notes") as string) || null,
+    },
+  });
+
+  revalidatePath("/admin/leads");
+  revalidatePath("/admin");
+  redirect("/admin/leads");
+}
+
+export async function addLeadNote(leadId: string, content: string) {
+  await requireSession();
+  const trimmed = content.trim();
+  if (!trimmed) return { success: false, error: "Note can't be empty." };
+
+  // Adding a note is itself a record of contact, so it also bumps
+  // lastContactedAt - a separate "Mark Contacted" action covers the case
+  // where an agent wants to log contact without writing anything down.
+  await prisma.$transaction([
+    prisma.leadNote.create({ data: { leadId, content: trimmed } }),
+    prisma.lead.update({ where: { id: leadId }, data: { lastContactedAt: new Date() } }),
+  ]);
+
+  revalidatePath("/admin/leads");
+  return { success: true };
+}
+
+export async function markLeadContacted(leadId: string) {
+  await requireSession();
+  await prisma.lead.update({ where: { id: leadId }, data: { lastContactedAt: new Date() } });
+  revalidatePath("/admin/leads");
   return { success: true };
 }

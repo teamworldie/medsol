@@ -62,6 +62,7 @@ model Lead {
   leadScore   Int?
   notes       String?
   aiSummary   String?
+  lastContactedAt DateTime?
 
   assignedToId String?
   assignedTo   User?    @relation(fields: [assignedToId], references: [id])
@@ -73,11 +74,22 @@ model Lead {
   messages    Message[]
   tasks       Task[]
   tags        Tag[]    @relation("LeadTags")
+  leadNotes   LeadNote[]
 
   @@index([status])
   @@index([createdAt])
   @@index([assignedToId])
   @@index([propertyId])
+}
+
+model LeadNote {
+  id        String   @id @default(cuid())
+  content   String
+  leadId    String
+  lead      Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@index([leadId])
 }
 
 model Tag {

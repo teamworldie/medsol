@@ -7,7 +7,7 @@ import { requireSession } from "@/lib/authGuard";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-export async function submitLead(prevState: any, formData: FormData) {
+export async function submitLead(prevState: unknown, formData: FormData) {
   try {
     // Honeypot: a hidden field real users never see or fill in. Bots that
     // blindly fill every field trip this, and we silently pretend success

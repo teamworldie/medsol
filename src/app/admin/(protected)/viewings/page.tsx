@@ -3,8 +3,17 @@ import Link from "next/link";
 import ViewingRowActions from "./ViewingRowActions";
 import ViewingsViewToggle from "./ViewingsViewToggle";
 
+type ViewingRow = {
+  id: string;
+  scheduledAt: Date;
+  status: string;
+  lead: { name: string } | null;
+  property: { title: string } | null;
+  agent: { name: string | null } | null;
+};
+
 export default async function ViewingsPage() {
-  let viewings: any[] = [];
+  let viewings: ViewingRow[] = [];
 
   try {
     // No pagination here: the calendar view needs the full set of viewings to

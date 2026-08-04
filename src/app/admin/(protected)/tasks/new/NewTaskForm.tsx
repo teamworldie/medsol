@@ -3,6 +3,8 @@
 import { useFormState, useFormStatus } from "react-dom";
 import Link from "next/link";
 
+type FormActionState = { error?: string } | undefined;
+
 function SaveButton() {
   const { pending } = useFormStatus();
   return (
@@ -21,7 +23,7 @@ export default function NewTaskForm({
   agents,
   leads,
 }: {
-  action: (prevState: any, formData: FormData) => Promise<any>;
+  action: (prevState: FormActionState, formData: FormData) => Promise<FormActionState>;
   agents: { id: string; name: string | null; email: string }[];
   leads: { id: string; name: string }[];
 }) {

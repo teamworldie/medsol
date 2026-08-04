@@ -5,6 +5,15 @@ import Pagination from "../Pagination";
 
 const PAGE_SIZE = 20;
 
+type TaskRow = {
+  id: string;
+  title: string;
+  dueDate: Date | null;
+  status: string;
+  agent: { name: string | null } | null;
+  lead: { name: string } | null;
+};
+
 export default async function TasksPage({
   searchParams,
 }: {
@@ -12,7 +21,7 @@ export default async function TasksPage({
 }) {
   const { page: pageParam } = await searchParams;
   const page = Math.max(1, Number(pageParam) || 1);
-  let tasks: any[] = [];
+  let tasks: TaskRow[] = [];
   let total = 0;
 
   try {

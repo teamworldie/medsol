@@ -2,6 +2,15 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
 import Link from "next/link";
 
+type RecentLead = {
+  id: string;
+  name: string;
+  email: string | null;
+  phone?: string | null;
+  status: string;
+  createdAt: Date;
+};
+
 export default async function AdminDashboardPage() {
   const session = await auth();
   const firstName = session?.user?.name?.split(" ")[0];
@@ -9,18 +18,18 @@ export default async function AdminDashboardPage() {
   let leadsCount = 0;
   let propertiesCount = 0;
   let viewingsCount = 0;
-  let recentLeads: any[] = [];
+  let recentLeads: RecentLead[] = [];
 
   try {
     leadsCount = await prisma.lead.count();
     propertiesCount = await prisma.property.count();
     viewingsCount = await prisma.viewing.count({ where: { status: "SCHEDULED" } });
-    
+
     recentLeads = await prisma.lead.findMany({
       take: 5,
       orderBy: { createdAt: "desc" }
     });
-  } catch (e) {
+  } catch {
     console.error("Prisma failed to load on Vercel preview. Using mock data.");
     // Provide a generic mock for the Vercel preview
     leadsCount = 14;
@@ -37,7 +46,7 @@ export default async function AdminDashboardPage() {
         <h1 className="text-2xl font-bold text-gray-900">
           Welcome back{firstName ? `, ${firstName}` : ""}!
         </h1>
-        <p className="text-gray-500 mt-1">Here's what's happening today.</p>
+        <p className="text-gray-500 mt-1">Here&apos;s what&apos;s happening today.</p>
       </div>
 
       {/* Quick Stats */}

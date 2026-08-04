@@ -102,7 +102,7 @@ function defaultSeoDescription(
   return `${title}${location}, listed at ${price}. Discover this exclusive property with ${SITE_NAME}.`;
 }
 
-export async function createProperty(prevState: any, formData: FormData) {
+export async function createProperty(prevState: unknown, formData: FormData) {
   await requireSession();
   const parsed = readPropertyForm(formData);
   if ("error" in parsed) return { success: false, error: parsed.error };
@@ -137,7 +137,7 @@ export async function createProperty(prevState: any, formData: FormData) {
   redirect("/admin/properties");
 }
 
-export async function updateProperty(id: string, prevState: any, formData: FormData) {
+export async function updateProperty(id: string, prevState: unknown, formData: FormData) {
   await requireSession();
   const parsed = readPropertyForm(formData);
   if ("error" in parsed) return { success: false, error: parsed.error };

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { Menu, X, LogOut, LayoutDashboard, Users, Home, Calendar, CheckSquare, MessageSquare, FileText, Settings, BarChart3, Image as ImageIcon } from "lucide-react";
@@ -17,10 +17,14 @@ export default function AdminShell({
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
 
-  // Close the drawer whenever the route changes (e.g. after tapping a nav link)
-  useEffect(() => {
+  // Close the drawer whenever the route changes (e.g. after tapping a nav
+  // link). Adjusting state during render avoids the extra cascading render
+  // pass an effect would cause here.
+  const [prevPathname, setPrevPathname] = useState(pathname);
+  if (pathname !== prevPathname) {
+    setPrevPathname(pathname);
     setMobileOpen(false);
-  }, [pathname]);
+  }
 
   return (
     <div className="min-h-screen bg-[#f8f9fa] text-gray-900 flex font-sans">

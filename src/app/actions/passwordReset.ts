@@ -20,7 +20,7 @@ async function getBaseUrl() {
 
 const GENERIC_SUCCESS_MESSAGE = "If an account exists for that email, we've sent a password reset link.";
 
-export async function requestPasswordReset(prevState: any, formData: FormData) {
+export async function requestPasswordReset(prevState: unknown, formData: FormData) {
   const email = ((formData.get("email") as string) || "").trim().toLowerCase();
   if (!email) {
     return { success: false, error: "Please enter your email address." };
@@ -75,7 +75,7 @@ export async function requestPasswordReset(prevState: any, formData: FormData) {
   return { success: true, message: GENERIC_SUCCESS_MESSAGE };
 }
 
-export async function resetPassword(prevState: any, formData: FormData) {
+export async function resetPassword(prevState: unknown, formData: FormData) {
   const token = formData.get("token") as string;
   const password = formData.get("password") as string;
   const confirmPassword = formData.get("confirmPassword") as string;

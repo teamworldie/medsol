@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 import { VIEWING_STATUSES } from "@/lib/viewingStatuses";
 import { requireSession } from "@/lib/authGuard";
 
-export async function createViewing(prevState: any, formData: FormData) {
+export async function createViewing(prevState: unknown, formData: FormData) {
   await requireSession();
   const leadId = formData.get("leadId") as string;
   const propertyId = formData.get("propertyId") as string;

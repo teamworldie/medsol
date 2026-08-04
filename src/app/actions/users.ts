@@ -8,7 +8,7 @@ import { validatePassword } from "@/lib/passwordPolicy";
 
 const USER_ROLES = ["ADMIN", "AGENT"];
 
-export async function createAgent(prevState: any, formData: FormData) {
+export async function createAgent(prevState: unknown, formData: FormData) {
   await requireAdmin();
 
   const name = formData.get("name") as string;

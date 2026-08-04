@@ -5,6 +5,15 @@ import Pagination from "../Pagination";
 
 const PAGE_SIZE = 20;
 
+type BlogPostRow = {
+  id: string;
+  title: string;
+  slug: string;
+  category: string | null;
+  publishedAt: Date | null;
+  createdAt: Date;
+};
+
 export default async function BlogPage({
   searchParams,
 }: {
@@ -12,7 +21,7 @@ export default async function BlogPage({
 }) {
   const { page: pageParam } = await searchParams;
   const page = Math.max(1, Number(pageParam) || 1);
-  let posts: any[] = [];
+  let posts: BlogPostRow[] = [];
   let total = 0;
 
   try {
@@ -26,11 +35,13 @@ export default async function BlogPage({
     ]);
     posts = rows;
     total = count;
-  } catch (e) {
+  } catch {
     console.error("Prisma failed to load on Vercel preview. Using mock data.");
+    // eslint-disable-next-line react-hooks/purity -- fallback-data path in a Server Component, not client render code
+    const now = Date.now();
     posts = [
-      { id: "1", title: "5 Tips for Writing a Great Property Listing", slug: "writing-a-great-listing", category: "Market Insights", publishedAt: new Date(), createdAt: new Date() },
-      { id: "2", title: "A Buyer's Guide to Puerto Banús", slug: "buyers-guide-puerto-banus", category: "Guides", publishedAt: null, createdAt: new Date(Date.now() - 86400000) },
+      { id: "1", title: "5 Tips for Writing a Great Property Listing", slug: "writing-a-great-listing", category: "Market Insights", publishedAt: new Date(now), createdAt: new Date(now) },
+      { id: "2", title: "A Buyer's Guide to Puerto Banús", slug: "buyers-guide-puerto-banus", category: "Guides", publishedAt: null, createdAt: new Date(now - 86400000) },
     ];
     total = posts.length;
   }

@@ -17,7 +17,7 @@ export async function addTagToLead(leadId: string, tagName: string, color?: stri
   const tag = await prisma.tag.upsert({
     where: { name },
     update: {},
-    create: { name, color: color && TAG_COLORS.includes(color as any) ? color : "gray" },
+    create: { name, color: color && TAG_COLORS.includes(color as (typeof TAG_COLORS)[number]) ? color : "gray" },
   });
 
   await prisma.lead.update({

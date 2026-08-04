@@ -22,7 +22,7 @@ export default function MediaUploader() {
         return;
       }
       router.refresh();
-    } catch (e) {
+    } catch {
       setError("Upload failed.");
     } finally {
       setUploading(false);

@@ -7,6 +7,28 @@ import Pagination from "../Pagination";
 
 const PAGE_SIZE = 20;
 
+type LeadRow = {
+  id: string;
+  name: string;
+  email: string | null;
+  phone: string | null;
+  preferredContact: string | null;
+  budget: string | null;
+  area: string | null;
+  propertyType: string | null;
+  bedrooms: string | null;
+  timeline: string | null;
+  source: string | null;
+  inquiryType: string | null;
+  propertyId: string | null;
+  status: string;
+  leadScore: number | null;
+  notes: string | null;
+  aiSummary: string | null;
+  createdAt: Date;
+  tags: { id: string; name: string; color: string }[];
+};
+
 export default async function LeadsPage({
   searchParams,
 }: {
@@ -14,7 +36,7 @@ export default async function LeadsPage({
 }) {
   const { tag, page: pageParam } = await searchParams;
   const page = Math.max(1, Number(pageParam) || 1);
-  let leads: any[] = [];
+  let leads: LeadRow[] = [];
   let allTags: { id: string; name: string; color: string }[] = [];
   let total = 0;
 
@@ -34,12 +56,27 @@ export default async function LeadsPage({
       prisma.tag.findMany({ orderBy: { name: "asc" } }),
     ]);
     total = count;
-  } catch (e) {
+  } catch {
     console.error("Prisma failed to load on Vercel preview. Using mock data.");
+    // eslint-disable-next-line react-hooks/purity -- fallback-data path in a Server Component, not client render code
+    const now = Date.now();
+    const emptyLeadDetails = {
+      preferredContact: null,
+      budget: null,
+      area: null,
+      propertyType: null,
+      bedrooms: null,
+      timeline: null,
+      inquiryType: null,
+      propertyId: null,
+      leadScore: null,
+      notes: null,
+      aiSummary: null,
+    };
     leads = [
-      { id: "1", name: "Alice Johnson", email: "alice@example.com", phone: "+420 123 456 789", source: "CONTACT_FORM", status: "NEW", createdAt: new Date(), tags: [] },
-      { id: "2", name: "Bob Smith", email: "bob@example.com", phone: "+44 7700 900077", source: "PROPERTY_INQUIRY", propertyId: "sample-a", status: "CONTACTED", createdAt: new Date(Date.now() - 86400000), tags: [] },
-      { id: "3", name: "Charlie Davis", email: "charlie@example.com", phone: "+1 555 123 4567", source: "NEWSLETTER", status: "QUALIFIED", createdAt: new Date(Date.now() - 172800000), tags: [] },
+      { id: "1", name: "Alice Johnson", email: "alice@example.com", phone: "+420 123 456 789", source: "CONTACT_FORM", status: "NEW", createdAt: new Date(now), tags: [], ...emptyLeadDetails },
+      { id: "2", name: "Bob Smith", email: "bob@example.com", phone: "+44 7700 900077", source: "PROPERTY_INQUIRY", status: "CONTACTED", createdAt: new Date(now - 86400000), tags: [], ...emptyLeadDetails, propertyId: "sample-a" },
+      { id: "3", name: "Charlie Davis", email: "charlie@example.com", phone: "+1 555 123 4567", source: "NEWSLETTER", status: "QUALIFIED", createdAt: new Date(now - 172800000), tags: [], ...emptyLeadDetails },
     ];
     total = leads.length;
   }

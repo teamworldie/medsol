@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useState } from "react";
 import { BLOG_CATEGORIES, calculateReadTime } from "@/lib/readTime";
 
+type FormActionState = { error?: string } | undefined;
+
 function FeaturedImageField({ initialUrl }: { initialUrl?: string | null }) {
   const [url, setUrl] = useState(initialUrl ?? "");
   const [uploading, setUploading] = useState(false);
@@ -82,7 +84,7 @@ export default function BlogPostForm({
   submitLabel,
   initial,
 }: {
-  action: (prevState: any, formData: FormData) => Promise<any>;
+  action: (prevState: FormActionState, formData: FormData) => Promise<FormActionState>;
   submitLabel: string;
   initial?: {
     title?: string;

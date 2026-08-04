@@ -41,7 +41,7 @@ function readBlogForm(formData: FormData) {
   } as const;
 }
 
-export async function createBlogPost(prevState: any, formData: FormData) {
+export async function createBlogPost(prevState: unknown, formData: FormData) {
   await requireSession();
   const parsed = readBlogForm(formData);
   if ("error" in parsed) return { success: false, error: parsed.error };
@@ -69,7 +69,7 @@ export async function createBlogPost(prevState: any, formData: FormData) {
   redirect("/admin/blog");
 }
 
-export async function updateBlogPost(id: string, prevState: any, formData: FormData) {
+export async function updateBlogPost(id: string, prevState: unknown, formData: FormData) {
   await requireSession();
   const parsed = readBlogForm(formData);
   if ("error" in parsed) return { success: false, error: parsed.error };

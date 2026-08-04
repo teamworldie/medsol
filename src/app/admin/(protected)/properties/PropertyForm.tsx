@@ -7,6 +7,8 @@ import { addPropertyType, addPropertyFeature } from "@/app/actions/propertyOptio
 
 const PROPERTY_STATUSES = ["AVAILABLE", "RESERVED", "SOLD"];
 
+type FormActionState = { error?: string } | undefined;
+
 async function uploadFile(file: File, kind: "image" | "pdf" = "image"): Promise<{ url?: string; error?: string }> {
   try {
     const formData = new FormData();
@@ -494,7 +496,7 @@ export default function PropertyForm({
   availableFeatures,
   initial,
 }: {
-  action: (prevState: any, formData: FormData) => Promise<any>;
+  action: (prevState: FormActionState, formData: FormData) => Promise<FormActionState>;
   submitLabel: string;
   availableTypes: string[];
   availableFeatures: string[];

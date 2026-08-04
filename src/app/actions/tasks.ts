@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireSession } from "@/lib/authGuard";
 
-export async function createTask(prevState: any, formData: FormData) {
+export async function createTask(prevState: unknown, formData: FormData) {
   await requireSession();
   const title = formData.get("title") as string;
   const agentId = formData.get("agentId") as string;

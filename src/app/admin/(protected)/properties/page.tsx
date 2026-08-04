@@ -6,6 +6,19 @@ import PropertiesTable from "./PropertiesTable";
 const PAGE_SIZE = 20;
 const PROPERTY_STATUSES = ["AVAILABLE", "RESERVED", "SOLD"];
 
+type PropertyRow = {
+  id: string;
+  title: string;
+  price: string;
+  status: string;
+  bedrooms: string | null;
+  bathrooms: string | null;
+  type: string | null;
+  community: string | null;
+  isFeatured: boolean;
+  createdAt: Date;
+};
+
 export default async function PropertiesPage({
   searchParams,
 }: {
@@ -14,7 +27,7 @@ export default async function PropertiesPage({
   const { page: pageParam, q, status, type } = await searchParams;
   const page = Math.max(1, Number(pageParam) || 1);
 
-  let properties: any[] = [];
+  let properties: PropertyRow[] = [];
   let total = 0;
   let statuses: string[] = [];
   let types: string[] = [];

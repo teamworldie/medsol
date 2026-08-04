@@ -24,3 +24,16 @@ export function sniffImageType(bytes: Uint8Array): { mime: string; ext: string }
   }
   return null;
 }
+
+// Separate from sniffImageType (rather than added to it) so that function's
+// image-only contract - and its SVG rejection in particular - never changes
+// by accident. PDF is not a script-execution vector the way SVG is, so it's
+// safe to allow through its own explicit check.
+const PDF_SIGNATURE = [0x25, 0x50, 0x44, 0x46, 0x2d]; // "%PDF-"
+
+export function sniffPdfType(bytes: Uint8Array): { mime: string; ext: string } | null {
+  if (PDF_SIGNATURE.every((b, i) => bytes[i] === b)) {
+    return { mime: "application/pdf", ext: "pdf" };
+  }
+  return null;
+}

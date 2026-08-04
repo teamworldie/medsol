@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { sniffImageType } from "./fileType";
+import { sniffImageType, sniffPdfType } from "./fileType";
 
 function bytes(...values: number[]): Uint8Array {
   return new Uint8Array(values);
@@ -36,5 +36,25 @@ describe("sniffImageType", () => {
 
   it("rejects an empty buffer", () => {
     expect(sniffImageType(new Uint8Array())).toBeNull();
+  });
+});
+
+describe("sniffPdfType", () => {
+  it("recognizes a real PDF signature", () => {
+    const pdf = bytes(0x25, 0x50, 0x44, 0x46, 0x2d, 0x31, 0x2e, 0x34);
+    expect(sniffPdfType(pdf)).toEqual({ mime: "application/pdf", ext: "pdf" });
+  });
+
+  it("rejects a plain text file mislabeled as a PDF", () => {
+    const text = new TextEncoder().encode("not actually a pdf");
+    expect(sniffPdfType(text)).toBeNull();
+  });
+
+  it("rejects a PNG signature", () => {
+    expect(sniffPdfType(bytes(0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a))).toBeNull();
+  });
+
+  it("rejects an empty buffer", () => {
+    expect(sniffPdfType(new Uint8Array())).toBeNull();
   });
 });

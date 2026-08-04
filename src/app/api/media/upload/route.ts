@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { getSupabaseAdmin, MEDIA_BUCKET } from "@/lib/supabaseAdmin";
-import { sniffImageType } from "@/lib/fileType";
+import { sniffImageType, sniffPdfType } from "@/lib/fileType";
 
 const MAX_SIZE_BYTES = 10 * 1024 * 1024;
 
@@ -22,12 +22,14 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "File too large (max 10MB)." }, { status: 400 });
   }
 
+  const kind = formData.get("kind") === "pdf" ? "pdf" : "image";
+
   const arrayBuffer = await file.arrayBuffer();
 
   // Never trust the client-supplied Content-Type header - verify the real
   // file content by its magic bytes instead. This also excludes SVG, which
   // can embed <script> and is a stored-XSS vector if served back to a browser.
-  const sniffed = sniffImageType(new Uint8Array(arrayBuffer));
+  const sniffed = kind === "pdf" ? sniffPdfType(new Uint8Array(arrayBuffer)) : sniffImageType(new Uint8Array(arrayBuffer));
   if (!sniffed) {
     return NextResponse.json({ error: "Unsupported or invalid file type." }, { status: 400 });
   }

@@ -7,10 +7,11 @@ import { addPropertyType, addPropertyFeature } from "@/app/actions/propertyOptio
 
 const PROPERTY_STATUSES = ["AVAILABLE", "RESERVED", "SOLD"];
 
-async function uploadFile(file: File): Promise<{ url?: string; error?: string }> {
+async function uploadFile(file: File, kind: "image" | "pdf" = "image"): Promise<{ url?: string; error?: string }> {
   try {
     const formData = new FormData();
     formData.append("file", file);
+    formData.append("kind", kind);
     const res = await fetch("/api/media/upload", { method: "POST", body: formData });
     const data = await res.json();
     if (!res.ok) return { error: data.error ?? "Upload failed." };
@@ -65,6 +66,193 @@ function FeaturedImageField({ initialUrl }: { initialUrl?: string | null }) {
           {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
         </div>
       </div>
+    </div>
+  );
+}
+
+function FloorplanImageField({ initialUrl }: { initialUrl?: string | null }) {
+  const [url, setUrl] = useState(initialUrl ?? "");
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleFile = async (file: File) => {
+    setUploading(true);
+    setError(null);
+    const result = await uploadFile(file);
+    if (result.error) setError(result.error);
+    else if (result.url) setUrl(result.url);
+    setUploading(false);
+  };
+
+  return (
+    <div>
+      <label className="block text-sm font-medium text-gray-700">Floorplan Image</label>
+      <p className="mt-1 text-xs text-gray-400">Shown alongside the surface-area table on the property page.</p>
+      <input type="hidden" name="floorplanImage" value={url} />
+      <div className="mt-2 flex items-start gap-4">
+        {url && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={url} alt="Floorplan" className="h-20 w-20 rounded-md object-cover border border-gray-200" />
+        )}
+        <div>
+          <label
+            className={`inline-flex items-center gap-2 rounded-md border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 ${
+              uploading ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-50 cursor-pointer"
+            }`}
+          >
+            {uploading ? "Uploading..." : url ? "Replace Floorplan" : "Upload Floorplan"}
+            <input
+              type="file"
+              accept="image/*"
+              disabled={uploading}
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) handleFile(file);
+              }}
+            />
+          </label>
+          {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function PdfField({ initialUrl }: { initialUrl?: string | null }) {
+  const [url, setUrl] = useState(initialUrl ?? "");
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleFile = async (file: File) => {
+    setUploading(true);
+    setError(null);
+    const result = await uploadFile(file, "pdf");
+    if (result.error) setError(result.error);
+    else if (result.url) setUrl(result.url);
+    setUploading(false);
+  };
+
+  return (
+    <div>
+      <label className="block text-sm font-medium text-gray-700">Specs / Brochure PDF</label>
+      <p className="mt-1 text-xs text-gray-400">Offered as a download from the property page.</p>
+      <input type="hidden" name="pdfUrl" value={url} />
+      <div className="mt-2 flex items-center gap-4">
+        {url && (
+          <a href={url} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-600 hover:underline">
+            View current PDF
+          </a>
+        )}
+        <div>
+          <label
+            className={`inline-flex items-center gap-2 rounded-md border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 ${
+              uploading ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-50 cursor-pointer"
+            }`}
+          >
+            {uploading ? "Uploading..." : url ? "Replace PDF" : "Upload PDF"}
+            <input
+              type="file"
+              accept=".pdf,application/pdf"
+              disabled={uploading}
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) handleFile(file);
+              }}
+            />
+          </label>
+          {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+type AreaRow = { label: string; value: string; type: "" | "header" | "total" };
+
+function parseAreaRows(raw: string | null | undefined): AreaRow[] {
+  if (!raw) return [];
+  try {
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed.map((row) => ({
+      label: typeof row?.label === "string" ? row.label : "",
+      value: typeof row?.value === "string" ? row.value : "",
+      type: row?.type === "header" || row?.type === "total" ? row.type : "",
+    }));
+  } catch {
+    return [];
+  }
+}
+
+function AreaDataField({ initialAreaData }: { initialAreaData?: string | null }) {
+  const [rows, setRows] = useState<AreaRow[]>(() => parseAreaRows(initialAreaData));
+
+  const updateRow = (index: number, patch: Partial<AreaRow>) => {
+    setRows((prev) => prev.map((row, i) => (i === index ? { ...row, ...patch } : row)));
+  };
+
+  const addRow = () => setRows((prev) => [...prev, { label: "", value: "", type: "" }]);
+  const removeRow = (index: number) => setRows((prev) => prev.filter((_, i) => i !== index));
+
+  const serialized = JSON.stringify(
+    rows
+      .filter((row) => row.label.trim() || row.value.trim())
+      .map((row) => (row.type ? row : { label: row.label, value: row.value }))
+  );
+
+  return (
+    <div>
+      <label className="block text-sm font-medium text-gray-700">Surface Area Table</label>
+      <p className="mt-1 text-xs text-gray-400">
+        Room-by-room breakdown shown next to the floorplan. Mark section headers and the final total row with a type.
+      </p>
+      <input type="hidden" name="areaData" value={serialized} />
+
+      <div className="mt-3 space-y-2">
+        {rows.map((row, i) => (
+          <div key={i} className="flex items-center gap-2">
+            <input
+              value={row.label}
+              onChange={(e) => updateRow(i, { label: e.target.value })}
+              placeholder="Label, e.g. Bedroom 1"
+              className="block w-full rounded-md border border-gray-300 pl-3 pr-2 py-1.5 text-sm text-gray-900 shadow-sm focus:border-gray-900 focus:outline-none"
+            />
+            <input
+              value={row.value}
+              onChange={(e) => updateRow(i, { value: e.target.value })}
+              placeholder="Value, e.g. 14,20m"
+              className="block w-40 shrink-0 rounded-md border border-gray-300 pl-3 pr-2 py-1.5 text-sm text-gray-900 shadow-sm focus:border-gray-900 focus:outline-none"
+            />
+            <select
+              value={row.type}
+              onChange={(e) => updateRow(i, { type: e.target.value as AreaRow["type"] })}
+              className="block w-32 shrink-0 rounded-md border border-gray-300 pl-2 pr-1 py-1.5 text-sm text-gray-900 shadow-sm focus:border-gray-900 focus:outline-none"
+            >
+              <option value="">Normal row</option>
+              <option value="header">Section header</option>
+              <option value="total">Total row</option>
+            </select>
+            <button
+              type="button"
+              onClick={() => removeRow(i)}
+              className="shrink-0 h-8 w-8 rounded-md border border-gray-300 text-gray-500 hover:bg-gray-50"
+              aria-label="Remove row"
+            >
+              ✕
+            </button>
+          </div>
+        ))}
+      </div>
+
+      <button
+        type="button"
+        onClick={addRow}
+        className="mt-3 rounded-md border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+      >
+        Add Row
+      </button>
     </div>
   );
 }
@@ -327,6 +515,9 @@ export default function PropertyForm({
     images?: string | null;
     videos?: string | null;
     features?: string | null;
+    floorplanImage?: string | null;
+    pdfUrl?: string | null;
+    areaData?: string | null;
     isFeatured?: boolean;
     seoTitle?: string | null;
     seoDescription?: string | null;
@@ -467,6 +658,12 @@ export default function PropertyForm({
       <FeaturedImageField initialUrl={initial?.featuredImage} />
 
       <GalleryField initialImages={initial?.images} />
+
+      <FloorplanImageField initialUrl={initial?.floorplanImage} />
+
+      <PdfField initialUrl={initial?.pdfUrl} />
+
+      <AreaDataField initialAreaData={initial?.areaData} />
 
       <div>
         <label className="block text-sm font-medium text-gray-700">Video Link (optional)</label>

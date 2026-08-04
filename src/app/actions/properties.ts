@@ -32,6 +32,19 @@ function parseJsonArrayField(values: string[]): string | null {
   return values.length > 0 ? JSON.stringify(values) : null;
 }
 
+// The area-data table arrives pre-serialized from AreaDataField's hidden
+// input - re-validate it actually parses to an array before trusting it,
+// rather than writing an arbitrary client-supplied string straight to the DB.
+function parseAreaDataField(raw: string | null): string | null {
+  if (!raw) return null;
+  try {
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) && parsed.length > 0 ? raw : null;
+  } catch {
+    return null;
+  }
+}
+
 function readPropertyForm(formData: FormData) {
   const title = formData.get("title") as string;
   const price = formData.get("price") as string;
@@ -61,6 +74,9 @@ function readPropertyForm(formData: FormData) {
       images: parseUrlList(formData.get("images") as string | null),
       videos: parseUrlList(formData.get("videos") as string | null),
       features: parseJsonArrayField(features),
+      floorplanImage: (formData.get("floorplanImage") as string) || null,
+      pdfUrl: (formData.get("pdfUrl") as string) || null,
+      areaData: parseAreaDataField(formData.get("areaData") as string | null),
       isFeatured: formData.get("isFeatured") === "yes",
       seoTitle: (formData.get("seoTitle") as string) || null,
       seoDescription: (formData.get("seoDescription") as string) || null,

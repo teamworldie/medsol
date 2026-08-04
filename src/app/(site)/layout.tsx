@@ -2,8 +2,23 @@ import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import Navbar from "@/components/site/Navbar";
 import PageTransition from "@/components/site/PageTransition";
+import { SITE_NAME, SITE_URL } from "@/lib/siteConfig";
 
 const GA_MEASUREMENT_ID = "G-Q3ZQJ5MH7T";
+
+const organizationJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "RealEstateAgent",
+  name: SITE_NAME,
+  url: SITE_URL,
+  description:
+    "Medsol Real Estate offers bespoke luxury villas and residences in Murcia, Spain, across Omala Residences, Alhama Nature and Corvera Hills.",
+  image: `${SITE_URL}/assets/images/medsol-logo-light.webp`,
+  areaServed: {
+    "@type": "AdministrativeArea",
+    name: "Murcia, Spain",
+  },
+};
 
 export const viewport: Viewport = {
   themeColor: "#0a0e17",
@@ -30,11 +45,11 @@ export const metadata: Metadata = {
   authors: [{ name: "Medsol Real Estate" }],
   robots: "index, follow",
   alternates: {
-    canonical: "https://www.medsol.es/",
+    canonical: `${SITE_URL}/`,
     languages: {
-      es: "https://www.medsol.es/es/",
-      en: "https://www.medsol.es/",
-      "x-default": "https://www.medsol.es/",
+      es: `${SITE_URL}/es/`,
+      en: `${SITE_URL}/`,
+      "x-default": `${SITE_URL}/`,
     },
   },
   openGraph: {
@@ -42,22 +57,23 @@ export const metadata: Metadata = {
     title: "Medsol Real Estate | Luxury Mediterranean Villas in Murcia, Spain",
     description:
       "Bespoke luxury villas and residences in Murcia, Spain. Explore Omala Residences, Alhama Nature and Corvera Hills — premium Mediterranean living.",
-    url: "https://www.medsol.es/",
+    url: `${SITE_URL}/`,
     siteName: "Medsol Real Estate",
-    images: ["https://www.medsol.es/assets/images/medsol-logo-light.webp"],
+    images: [`${SITE_URL}/assets/images/medsol-logo-light.webp`],
     locale: "en_US",
   },
   twitter: {
     card: "summary_large_image",
     title: "Medsol Real Estate | Luxury Mediterranean Villas in Murcia, Spain",
     description: "Bespoke luxury villas and residences in Murcia, Spain. Explore Omala Residences, Alhama Nature and Corvera Hills.",
-    images: ["https://www.medsol.es/assets/images/medsol-logo-light.webp"],
+    images: [`${SITE_URL}/assets/images/medsol-logo-light.webp`],
   },
 };
 
 export default function SiteLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="medsol-site">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }} />
       <Script src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`} strategy="afterInteractive" />
       <Script id="google-analytics" strategy="afterInteractive">
         {`

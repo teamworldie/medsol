@@ -207,8 +207,13 @@ model BlogPost {
   slug          String   @unique
   title         String
   excerpt       String?
-  content       String   // Plain text; paragraphs split on blank lines (not HTML/Markdown - not rendered as such)
-  seoMeta       String?  // JSON stringified
+  content       String   // Plain text; paragraphs split on blank lines. Supports "## "/"### " headings,
+                          // "- " list items, **bold**, and [text](url) links - see src/lib/blogContent.ts
+  seoMeta       String?  // JSON stringified (legacy, unused - see seoTitle/seoDescription instead)
+  seoTitle      String?  // Auto-generated on create, editable afterward
+  seoDescription String? // Auto-generated on create, editable afterward
+  author        String?  // Byline shown on the public post
+  targetKeyword String?  // Internal SEO tracking - which content-plan keyword this post targets
   featuredImage String?
   category      String?
   readTime      String?

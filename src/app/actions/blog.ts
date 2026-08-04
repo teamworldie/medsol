@@ -7,6 +7,7 @@ import { redirect } from "next/navigation";
 import { requireSession } from "@/lib/authGuard";
 import { slugify } from "@/lib/slug";
 import { calculateReadTime } from "@/lib/readTime";
+import { SITE_NAME } from "@/lib/siteConfig";
 
 async function uniqueSlug(title: string, ignoreId?: string): Promise<string> {
   const base = slugify(title) || "post";
@@ -20,6 +21,16 @@ async function uniqueSlug(title: string, ignoreId?: string): Promise<string> {
   }
 }
 
+function defaultSeoTitle(title: string) {
+  return `${title} | ${SITE_NAME}`;
+}
+
+function defaultSeoDescription(excerpt: string | null, content: string) {
+  const source = excerpt || content;
+  const trimmed = source.trim().replace(/\s+/g, " ");
+  return trimmed.length > 155 ? `${trimmed.slice(0, 152)}...` : trimmed;
+}
+
 function readBlogForm(formData: FormData) {
   const title = formData.get("title") as string;
   const content = formData.get("content") as string;
@@ -28,14 +39,22 @@ function readBlogForm(formData: FormData) {
     return { error: "Title and content are required." } as const;
   }
 
+  const excerpt = (formData.get("excerpt") as string) || null;
+  const seoTitle = (formData.get("seoTitle") as string) || defaultSeoTitle(title);
+  const seoDescription = (formData.get("seoDescription") as string) || defaultSeoDescription(excerpt, content);
+
   return {
     data: {
       title,
       content,
-      excerpt: (formData.get("excerpt") as string) || null,
+      excerpt,
       category: (formData.get("category") as string) || null,
       readTime: calculateReadTime(content),
       featuredImage: (formData.get("featuredImage") as string) || null,
+      seoTitle,
+      seoDescription,
+      author: (formData.get("author") as string) || "Medsol Team",
+      targetKeyword: (formData.get("targetKeyword") as string) || null,
     },
     published: formData.get("published") === "on",
   } as const;

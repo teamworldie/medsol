@@ -14,6 +14,7 @@
     "seed": "tsx seed.ts"
   },
   "dependencies": {
+    "@google-analytics/data": "^7.0.0",
     "@prisma/client": "^5.22.0",
     "@sentry/nextjs": "^10.67.0",
     "@supabase/supabase-js": "^2.110.7",

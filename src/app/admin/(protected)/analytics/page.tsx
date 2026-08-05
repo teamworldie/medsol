@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import InquiryTypeFilter from "./InquiryTypeFilter";
+import { getTrafficSummary, type TrafficSummary } from "@/lib/googleAnalytics";
 
 const STATUS_ORDER = ["NEW", "CONTACTED", "QUALIFIED", "LOST", "ARCHIVED"];
 const STATUS_COLORS: Record<string, string> = {
@@ -40,6 +41,13 @@ export default async function AnalyticsPage({
   searchParams: Promise<{ inquiryType?: string }>;
 }) {
   const { inquiryType: activeInquiryType } = await searchParams;
+
+  let traffic: TrafficSummary | null = null;
+  try {
+    traffic = await getTrafficSummary(30);
+  } catch (e) {
+    console.error("Failed to fetch GA4 traffic summary:", e);
+  }
 
   let totalLeads = 0;
   let qualifiedLeads = 0;
@@ -120,14 +128,50 @@ export default async function AnalyticsPage({
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Analytics</h1>
-          <p className="text-gray-500 mt-1">
-            Based on CRM data. Website visitor and page-view analytics require a separate tracking
-            integration (e.g. Vercel Analytics) that isn&apos;t connected yet.
-          </p>
+          <p className="text-gray-500 mt-1">Lead pipeline and website traffic, in one place.</p>
         </div>
         <InquiryTypeFilter options={inquiryTypeOptions} active={activeInquiryType ?? null} />
       </div>
 
+      <div>
+        <h2 className="text-sm font-semibold text-gray-900 mb-3">Website Traffic (last 30 days)</h2>
+        {traffic ? (
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <StatCard title="Visitors" value={traffic.users} />
+              <StatCard title="Sessions" value={traffic.sessions} />
+              <StatCard title="Page Views" value={traffic.pageViews} />
+            </div>
+            {traffic.topPages.length > 0 && (
+              <div className="p-6 bg-white border border-gray-200 rounded-lg shadow-sm">
+                <h3 className="font-semibold text-gray-900 mb-4">Top Pages</h3>
+                <div className="space-y-3">
+                  {traffic.topPages.map((page) => (
+                    <BarRow
+                      key={page.path}
+                      label={page.path}
+                      count={page.views}
+                      max={Math.max(1, ...traffic!.topPages.map((p) => p.views))}
+                      colorClass="bg-gray-900"
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="p-6 bg-white border border-gray-200 rounded-lg shadow-sm">
+            <p className="text-sm text-gray-500">
+              Website traffic isn&apos;t connected yet. It needs a Google Analytics 4 service account
+              (property ID + credentials) set as environment variables - ask your developer to set
+              this up.
+            </p>
+          </div>
+        )}
+      </div>
+
+      <div className="space-y-6">
+        <h2 className="text-sm font-semibold text-gray-900 mb-3">Lead Pipeline</h2>
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <StatCard title="Total Leads" value={totalLeads} />
         <StatCard title="Qualified Leads" value={qualifiedLeads} />
@@ -220,6 +264,7 @@ export default async function AnalyticsPage({
             </div>
           </>
         )}
+      </div>
       </div>
     </div>
   );

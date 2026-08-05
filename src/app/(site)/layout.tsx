@@ -1,10 +1,8 @@
 import type { Metadata, Viewport } from "next";
-import Script from "next/script";
 import Navbar from "@/components/site/Navbar";
 import PageTransition from "@/components/site/PageTransition";
+import CookieConsent from "@/components/site/CookieConsent";
 import { SITE_NAME, SITE_URL } from "@/lib/siteConfig";
-
-const GA_MEASUREMENT_ID = "G-Q3ZQJ5MH7T";
 
 const organizationJsonLd = {
   "@context": "https://schema.org",
@@ -74,17 +72,9 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
   return (
     <div className="medsol-site">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }} />
-      <Script src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`} strategy="afterInteractive" />
-      <Script id="google-analytics" strategy="afterInteractive">
-        {`
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-          gtag('config', '${GA_MEASUREMENT_ID}');
-        `}
-      </Script>
       <Navbar />
       <PageTransition>{children}</PageTransition>
+      <CookieConsent />
     </div>
   );
 }

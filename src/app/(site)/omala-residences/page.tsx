@@ -4,6 +4,7 @@ import { ArrowRight, Waves, Shield, Sun, Wind } from "lucide-react";
 import { getPropertiesByCommunity, COMMUNITIES } from "@/lib/properties";
 import InquiryForm from "@/components/site/InquiryForm";
 import Footer from "@/components/site/Footer";
+import StatusBadge from "@/components/site/StatusBadge";
 
 export const dynamic = "force-dynamic";
 
@@ -85,6 +86,7 @@ export default async function OmalaResidences() {
                   <div className="absolute top-8 left-8 text-white">
                     <span className="text-[10px] tracking-[0.3em] uppercase block font-medium">0{i + 1}</span>
                   </div>
+                  <StatusBadge status={villa.status} className="absolute top-8 right-8" />
                 </Link>
                 <div className="space-y-4">
                   <h3 className="text-3xl font-serif">{villa.title}</h3>

@@ -4,6 +4,7 @@ import { ArrowRight } from "lucide-react";
 import { getPropertiesByCommunity, COMMUNITIES } from "@/lib/properties";
 import InquiryForm from "@/components/site/InquiryForm";
 import Footer from "@/components/site/Footer";
+import StatusBadge from "@/components/site/StatusBadge";
 
 export const dynamic = "force-dynamic";
 
@@ -89,6 +90,7 @@ export default async function Corvera() {
                 <div className="aspect-video overflow-hidden relative mb-8">
                   <img src={villa.featuredImage ?? ""} className="w-full h-full object-cover transition-transform duration-[2s] group-hover:scale-110" alt={villa.title} />
                   <div className="absolute inset-0 bg-medsol-blue/40 group-hover:bg-medsol-blue/10 transition-colors z-10" />
+                  <StatusBadge status={villa.status} className="absolute top-4 right-4 z-20" />
                 </div>
                 <div className="flex justify-between items-start mb-4">
                   <div className="space-y-2">

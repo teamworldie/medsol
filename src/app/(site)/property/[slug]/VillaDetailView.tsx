@@ -6,6 +6,7 @@ import { motion } from "motion/react";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import type { Property } from "@prisma/client";
 import InquiryForm from "@/components/site/InquiryForm";
+import StatusBadge from "@/components/site/StatusBadge";
 import type { AreaRow } from "@/lib/properties";
 
 export default function VillaDetailView({
@@ -44,7 +45,10 @@ export default function VillaDetailView({
               <ArrowLeft className="w-4 h-4" /> Go Back
             </button>
             <h1 className="text-5xl md:text-8xl font-serif leading-none text-white italic">{property.title}</h1>
-            {property.community && <span className="text-medsol-gold text-[12px] tracking-[0.4em] uppercase block pt-4">{property.community}</span>}
+            <div className="flex items-center justify-center gap-4 pt-4">
+              {property.community && <span className="text-medsol-gold text-[12px] tracking-[0.4em] uppercase block">{property.community}</span>}
+              <StatusBadge status={property.status} />
+            </div>
           </motion.div>
         </div>
       </section>

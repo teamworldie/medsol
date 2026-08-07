@@ -1,16 +1,20 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { Metadata } from "next";
 import { ArrowRight, Waves, Sun, Mountain, MapPin } from "lucide-react";
 import { getPropertiesByCommunity, COMMUNITIES } from "@/lib/properties";
 import InquiryForm from "@/components/site/InquiryForm";
 import Footer from "@/components/site/Footer";
 import StatusBadge from "@/components/site/StatusBadge";
+import { SITE_URL } from "@/lib/siteConfig";
 
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Alhama Nature",
   description: "Alhama Nature — embrace nature and golf, nestled around a Jack Nicklaus signature golf course in Murcia.",
+  alternates: { canonical: `${SITE_URL}/alhama-nature` },
+  openGraph: { url: `${SITE_URL}/alhama-nature` },
 };
 
 export default async function AlhamaNature() {
@@ -21,8 +25,15 @@ export default async function AlhamaNature() {
       {/* 1. HERO SECTION */}
       <section className="relative h-screen w-full flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0 pointer-events-none">
-          <img src="/assets/images/Alhama-sunset-148-1024x682.webp" alt="Alhama Nature Sunset" className="absolute inset-0 w-full h-full object-cover opacity-60" />
-          <div className="absolute inset-0 bg-gradient-to-b from-[#0a0e17]/80 via-[#0a0e17]/40 to-bg-primary" />
+          <Image
+            src="/assets/images/Alhama-sunset-148-1024x682.webp"
+            alt="Alhama Nature Sunset"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover opacity-60"
+          />
+          <div className="absolute inset-0 bg-[#0a0e17]/70" />
         </div>
 
         <div className="relative z-10 text-center max-content">
@@ -41,8 +52,14 @@ export default async function AlhamaNature() {
         <div className="bg-noise absolute inset-0 opacity-10 pointer-events-none" />
         <div className="max-content relative z-10">
           <div className="grid lg:grid-cols-2 gap-24 items-center">
-            <div className="order-last lg:order-first relative group overflow-hidden">
-              <img src="/assets/images/Alhama-sunset-32-qyk0bjd420k5mb4uif4uz8v7akailj70lczx644m1s.webp" className="w-full h-full object-cover transition-transform duration-[2s] group-hover:scale-110" alt="Golf Village" />
+            <div className="order-last lg:order-first relative group overflow-hidden aspect-square">
+              <Image
+                src="/assets/images/Alhama-sunset-32-qyk0bjd420k5mb4uif4uz8v7akailj70lczx644m1s.webp"
+                fill
+                sizes="(min-width: 1024px) 50vw, 100vw"
+                className="object-cover transition-transform duration-[2s] group-hover:scale-110"
+                alt="Golf Village"
+              />
               <div className="absolute inset-0 border-[20px] border-[#387262]/20 pointer-events-none" />
             </div>
             <div className="space-y-12">
@@ -107,7 +124,13 @@ export default async function AlhamaNature() {
             {villas.map((villa) => (
               <Link href={`/property/${villa.slug}`} key={villa.id} className="group cursor-pointer block">
                 <div className="aspect-video overflow-hidden relative mb-8">
-                  <img src={villa.featuredImage ?? ""} className="w-full h-full object-cover transition-transform duration-[2s] group-hover:scale-110" alt={villa.title} />
+                  <Image
+                    src={villa.featuredImage ?? ""}
+                    fill
+                    sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
+                    className="object-cover transition-transform duration-[2s] group-hover:scale-110"
+                    alt={villa.title}
+                  />
                   <div className="absolute inset-0 bg-medsol-blue/40 group-hover:bg-medsol-blue/10 transition-colors" />
                   <StatusBadge status={villa.status} className="absolute top-4 right-4" />
                 </div>
@@ -171,7 +194,13 @@ export default async function AlhamaNature() {
               </p>
             </div>
             <div className="relative aspect-square overflow-hidden group">
-              <img src="/assets/images/K_2vZcSg.webp" className="w-full h-full object-cover transition-transform duration-[2s] group-hover:scale-110" alt="Nostrum Living" />
+              <Image
+                src="/assets/images/K_2vZcSg.webp"
+                fill
+                sizes="(min-width: 1024px) 50vw, 100vw"
+                className="object-cover transition-transform duration-[2s] group-hover:scale-110"
+                alt="Nostrum Living"
+              />
               <div className="absolute inset-0 bg-medsol-blue/20" />
             </div>
           </div>

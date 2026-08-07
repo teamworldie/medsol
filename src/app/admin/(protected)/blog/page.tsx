@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import BlogPostRowActions from "./BlogPostRowActions";
 import Pagination from "../Pagination";
+import { SPAIN_TZ } from "@/lib/timezone";
 
 const PAGE_SIZE = 20;
 
@@ -105,14 +106,36 @@ export default async function BlogPage({
                       {post.category ?? "—"}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {post.createdAt.toLocaleDateString()}
+                      {post.createdAt.toLocaleDateString("en-GB", { timeZone: SPAIN_TZ })}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        post.publishedAt ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                      }`}>
-                        {post.publishedAt ? "Published" : "Draft"}
-                      </span>
+                      {(() => {
+                        const isScheduled = post.publishedAt && post.publishedAt.getTime() > Date.now();
+                        const label = isScheduled ? "Scheduled" : post.publishedAt ? "Published" : "Draft";
+                        const colorClass = isScheduled
+                          ? "bg-amber-100 text-amber-800"
+                          : post.publishedAt
+                            ? "bg-green-100 text-green-800"
+                            : "bg-gray-100 text-gray-800";
+                        return (
+                          <div className="flex flex-col gap-0.5">
+                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium w-fit ${colorClass}`}>
+                              {label}
+                            </span>
+                            {isScheduled && post.publishedAt && (
+                              <span className="text-[11px] text-gray-400">
+                                {post.publishedAt.toLocaleString("en-GB", {
+                                  timeZone: SPAIN_TZ,
+                                  day: "numeric",
+                                  month: "short",
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                })}
+                              </span>
+                            )}
+                          </div>
+                        );
+                      })()}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right">
                       <BlogPostRowActions id={post.id} />

@@ -23,6 +23,10 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
+  // Required for Next to resolve relative OG/canonical URLs correctly:
+  // without it, every page's canonical silently falls back to this root
+  // metadata's own canonical/URL instead of its own path.
+  metadataBase: new URL(SITE_URL),
   title: {
     default: "Medsol Real Estate | Luxury Mediterranean Villas in Murcia, Spain",
     template: "%s | Medsol Real Estate",

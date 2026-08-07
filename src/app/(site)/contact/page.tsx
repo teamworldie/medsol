@@ -2,10 +2,13 @@ import type { Metadata } from "next";
 import { MapPin, Phone, Clock } from "lucide-react";
 import InquiryForm from "@/components/site/InquiryForm";
 import Footer from "@/components/site/Footer";
+import { SITE_URL } from "@/lib/siteConfig";
 
 export const metadata: Metadata = {
   title: "Contact",
   description: "Connect with Medsol Real Estate. Our dedicated advisors are at your service for bespoke guidance on Murcia's finest resort residences.",
+  alternates: { canonical: `${SITE_URL}/contact` },
+  openGraph: { url: `${SITE_URL}/contact` },
 };
 
 export default function Contact() {

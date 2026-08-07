@@ -12,6 +12,17 @@ import { SITE_NAME } from "@/lib/siteConfig";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+const MAX_LENGTHS = { name: 200, email: 254, phone: 40, message: 5000 } as const;
+
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 type NewLeadSummary = {
   name: string;
   email: string | null;
@@ -40,13 +51,13 @@ async function sendLeadNotificationEmail(lead: NewLeadSummary) {
       html: `
         <p>A new lead came in on ${SITE_NAME}.</p>
         <ul>
-          <li><strong>Name:</strong> ${lead.name}</li>
-          ${lead.email ? `<li><strong>Email:</strong> ${lead.email}</li>` : ""}
-          ${lead.phone ? `<li><strong>Phone:</strong> ${lead.phone}</li>` : ""}
-          ${lead.source ? `<li><strong>Source:</strong> ${lead.source}</li>` : ""}
-          ${lead.inquiryType ? `<li><strong>Inquiry Type:</strong> ${lead.inquiryType}</li>` : ""}
+          <li><strong>Name:</strong> ${escapeHtml(lead.name)}</li>
+          ${lead.email ? `<li><strong>Email:</strong> ${escapeHtml(lead.email)}</li>` : ""}
+          ${lead.phone ? `<li><strong>Phone:</strong> ${escapeHtml(lead.phone)}</li>` : ""}
+          ${lead.source ? `<li><strong>Source:</strong> ${escapeHtml(lead.source)}</li>` : ""}
+          ${lead.inquiryType ? `<li><strong>Inquiry Type:</strong> ${escapeHtml(lead.inquiryType)}</li>` : ""}
         </ul>
-        ${lead.notes ? `<p><strong>Message:</strong><br>${lead.notes}</p>` : ""}
+        ${lead.notes ? `<p><strong>Message:</strong><br>${escapeHtml(lead.notes)}</p>` : ""}
         <p><a href="https://medsol-crm.vercel.app/admin/leads">View in the admin dashboard</a></p>
       `,
     });
@@ -65,7 +76,7 @@ export async function submitLead(prevState: unknown, formData: FormData) {
     }
 
     const ip = (await headers()).get("x-forwarded-for") ?? "unknown";
-    if (isRateLimited(`lead-submit:${ip}`, 5, 10 * 60 * 1000)) {
+    if (await isRateLimited(`lead-submit:${ip}`, 5, 10 * 60 * 1000)) {
       return { success: false, error: "Too many requests. Please try again in a few minutes." };
     }
 
@@ -79,6 +90,15 @@ export async function submitLead(prevState: unknown, formData: FormData) {
 
     if (!name || !email || !EMAIL_RE.test(email)) {
       return { success: false, error: "Please enter a valid name and email address." };
+    }
+
+    if (
+      name.length > MAX_LENGTHS.name ||
+      email.length > MAX_LENGTHS.email ||
+      (phone && phone.length > MAX_LENGTHS.phone) ||
+      (message && message.length > MAX_LENGTHS.message)
+    ) {
+      return { success: false, error: "One of the fields is too long. Please shorten your message and try again." };
     }
 
     // In a Vercel preview with ephemeral SQLite, this might fail, so we wrap it in a try/catch
@@ -144,6 +164,15 @@ export async function createLead(prevState: CreateLeadState, formData: FormData)
   const source = (formData.get("source") as string) || "MANUAL";
   const inquiryType = (formData.get("inquiryType") as string) || null;
   const notes = (formData.get("notes") as string) || null;
+
+  if (
+    name.length > MAX_LENGTHS.name ||
+    (email && email.length > MAX_LENGTHS.email) ||
+    (phone && phone.length > MAX_LENGTHS.phone) ||
+    (notes && notes.length > MAX_LENGTHS.message)
+  ) {
+    return { error: "One of the fields is too long." };
+  }
 
   await prisma.lead.create({
     data: {

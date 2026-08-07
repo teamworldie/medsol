@@ -2,8 +2,12 @@ import type { Metadata } from "next";
 import fs from "node:fs";
 import path from "node:path";
 import Footer from "@/components/site/Footer";
+import { SITE_URL } from "@/lib/siteConfig";
 
-export const metadata: Metadata = { title: "Privacy Policy" };
+export const metadata: Metadata = {
+  title: "Privacy Policy",
+  alternates: { canonical: `${SITE_URL}/privacy-policy` },
+};
 
 export default function PrivacyPolicy() {
   const privacyHtml = fs.readFileSync(path.join(process.cwd(), "src/content/privacy.txt"), "utf-8");

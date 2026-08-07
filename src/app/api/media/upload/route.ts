@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { getSupabaseAdmin, MEDIA_BUCKET } from "@/lib/supabaseAdmin";
 import { sniffImageType, sniffPdfType } from "@/lib/fileType";
+import { isRateLimited } from "@/lib/rateLimit";
 
 const MAX_SIZE_BYTES = 10 * 1024 * 1024;
 
@@ -10,6 +11,14 @@ export async function POST(request: NextRequest) {
   const session = await auth();
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  // Authenticated-only, but still capped in case an agent account is
+  // compromised or a buggy client retries in a loop - protects Supabase
+  // Storage usage/cost, not a security boundary on its own.
+  const userKey = session.user?.email ?? "unknown";
+  if (await isRateLimited(`media-upload:${userKey}`, 30, 10 * 60 * 1000)) {
+    return NextResponse.json({ error: "Too many uploads. Please wait a few minutes and try again." }, { status: 429 });
   }
 
   const formData = await request.formData();

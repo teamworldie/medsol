@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { motion } from "motion/react";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import type { Property } from "@prisma/client";
@@ -34,7 +35,14 @@ export default function VillaDetailView({
       <section className="relative h-[70vh] w-full flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0 pointer-events-none">
           {property.featuredImage && (
-            <img src={property.featuredImage} alt={property.title} className="absolute inset-0 w-full h-full object-cover" />
+            <Image
+              src={property.featuredImage}
+              alt={property.title}
+              fill
+              priority
+              sizes="100vw"
+              className="object-cover"
+            />
           )}
           <div className="absolute inset-0 bg-gradient-to-b from-[#0a0e17]/80 via-[#0a0e17]/40 to-bg-primary" />
         </div>
@@ -128,7 +136,13 @@ export default function VillaDetailView({
           <div ref={galleryRef} className="w-full overflow-x-auto snap-x snap-mandatory flex gap-6 px-8 md:px-[calc((100vw-1200px)/2)] lg:px-[calc((100vw-1400px)/2)] pb-8 hide-scrollbar">
             {gallery.map((img, idx) => (
               <div key={idx} className="snap-center shrink-0 w-[85vw] md:w-[60vw] lg:w-[900px] aspect-[16/9] relative group overflow-hidden rounded-xl border border-white/5">
-                <img src={img} alt={`${property.title} Gallery Image ${idx + 1}`} className="w-full h-full object-cover transition-transform duration-[1.5s] group-hover:scale-105" />
+                <Image
+                  src={img}
+                  alt={`${property.title} Gallery Image ${idx + 1}`}
+                  fill
+                  sizes="(min-width: 1024px) 900px, (min-width: 768px) 60vw, 85vw"
+                  className="object-cover transition-transform duration-[1.5s] group-hover:scale-105"
+                />
               </div>
             ))}
           </div>
@@ -143,6 +157,7 @@ export default function VillaDetailView({
               {property.floorplanImage && (
                 <div className={`col-span-12 ${areaData.length > 0 ? "lg:col-span-7" : ""} relative`}>
                   <div className="bg-[#e0dcd3] rounded-xl overflow-hidden shadow-2xl relative group p-4 border border-white/10">
+                    {/* eslint-disable-next-line @next/next/no-img-element -- floorplans are uploaded per-property with varying real aspect ratios; next/image needs the true intrinsic width/height (which we don't store), and a guessed ratio would distort or letterbox floorplans that aren't actually that shape. */}
                     <img
                       src={property.floorplanImage}
                       className="w-full h-auto object-contain mix-blend-multiply opacity-90 transition-transform duration-700 group-hover:scale-105"

@@ -1,16 +1,20 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { Metadata } from "next";
 import { ArrowRight, Waves, Shield, Sun, Wind } from "lucide-react";
 import { getPropertiesByCommunity, COMMUNITIES } from "@/lib/properties";
 import InquiryForm from "@/components/site/InquiryForm";
 import Footer from "@/components/site/Footer";
 import StatusBadge from "@/components/site/StatusBadge";
+import { SITE_URL } from "@/lib/siteConfig";
 
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Omala Residences",
   description: "Omala Residences — space as a privilege, amplitude as a hallmark. Redefining luxury living in Murcia.",
+  alternates: { canonical: `${SITE_URL}/omala-residences` },
+  openGraph: { url: `${SITE_URL}/omala-residences` },
 };
 
 export default async function OmalaResidences() {
@@ -21,8 +25,15 @@ export default async function OmalaResidences() {
       {/* 1. HERO SECTION */}
       <section className="relative h-screen w-full flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0 pointer-events-none">
-          <img src="/assets/images/Omala-Residences-Entorno.webp" alt="Omala Residences Entorno" className="absolute inset-0 w-full h-full object-cover opacity-60" />
-          <div className="absolute inset-0 bg-gradient-to-b from-[#0a0e17]/80 via-[#0a0e17]/40 to-bg-primary" />
+          <Image
+            src="/assets/images/Omala-Residences-Entorno.webp"
+            alt="Omala Residences Entorno"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover opacity-60"
+          />
+          <div className="absolute inset-0 bg-[#0a0e17]/70" />
         </div>
 
         <div className="relative z-10 text-center max-content">
@@ -60,8 +71,14 @@ export default async function OmalaResidences() {
                 </div>
               </div>
             </div>
-            <div className="relative group overflow-hidden">
-              <img src="/assets/images/lwoXkcnM.webp" className="w-full h-full object-cover transition-transform duration-[2s] group-hover:scale-110" alt="Omala Lifestyle" />
+            <div className="relative group overflow-hidden aspect-square">
+              <Image
+                src="/assets/images/lwoXkcnM.webp"
+                fill
+                sizes="(min-width: 1024px) 50vw, 100vw"
+                className="object-cover transition-transform duration-[2s] group-hover:scale-110"
+                alt="Omala Lifestyle"
+              />
               <div className="absolute inset-0 border-[20px] border-white/20 pointer-events-none" />
             </div>
           </div>
@@ -81,7 +98,13 @@ export default async function OmalaResidences() {
             {villas.map((villa, i) => (
               <div key={villa.id} className="group cursor-pointer space-y-8">
                 <Link href={`/property/${villa.slug}`} className="aspect-[4/5] overflow-hidden relative block">
-                  <img src={villa.featuredImage ?? ""} className="w-full h-full object-cover grayscale transition-all duration-[1.5s] group-hover:grayscale-0 group-hover:scale-105" alt={villa.title} />
+                  <Image
+                    src={villa.featuredImage ?? ""}
+                    fill
+                    sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
+                    className="object-cover grayscale transition-all duration-[1.5s] group-hover:grayscale-0 group-hover:scale-105"
+                    alt={villa.title}
+                  />
                   <div className="absolute inset-0 bg-medsol-blue/20 group-hover:bg-transparent transition-all" />
                   <div className="absolute top-8 left-8 text-white">
                     <span className="text-[10px] tracking-[0.3em] uppercase block font-medium">0{i + 1}</span>
@@ -116,7 +139,13 @@ export default async function OmalaResidences() {
         <div className="max-content">
           <div className="grid lg:grid-cols-[1.5fr_1fr] gap-24 items-center">
             <div className="relative aspect-video lg:aspect-auto h-auto lg:h-[60vh] overflow-hidden w-full">
-              <img src="/assets/images/Cocina.webp" className="w-full h-full object-cover" alt="Interior Design" />
+              <Image
+                src="/assets/images/Cocina.webp"
+                fill
+                sizes="(min-width: 1024px) 60vw, 100vw"
+                className="object-cover"
+                alt="Interior Design"
+              />
             </div>
             <div className="space-y-12">
               <span className="text-medsol-blue text-[11px] tracking-[0.5em] uppercase font-bold">Interior Curation</span>
@@ -171,9 +200,15 @@ export default async function OmalaResidences() {
               </div>
             </div>
             <div className="relative aspect-square grid grid-cols-2 grid-rows-2 gap-4">
-              <div className="col-span-2 overflow-hidden"><img src="/assets/images/Comedor-cocina.webp" className="w-full h-full object-cover" alt="Comedor cocina" /></div>
-              <div className="overflow-hidden"><img src="/assets/images/Ac0Q8PEQ.webp" className="w-full h-full object-cover" alt="Salón cocina" /></div>
-              <div className="overflow-hidden"><img src="/assets/images/Piscina comunitaria.webp" className="w-full h-full object-cover" alt="Piscina comunitaria" /></div>
+              <div className="col-span-2 overflow-hidden relative">
+                <Image src="/assets/images/Comedor-cocina.webp" fill sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover" alt="Comedor cocina" />
+              </div>
+              <div className="overflow-hidden relative">
+                <Image src="/assets/images/Ac0Q8PEQ.webp" fill sizes="(min-width: 1024px) 25vw, 50vw" className="object-cover" alt="Salón cocina" />
+              </div>
+              <div className="overflow-hidden relative">
+                <Image src="/assets/images/Piscina comunitaria.webp" fill sizes="(min-width: 1024px) 25vw, 50vw" className="object-cover" alt="Piscina comunitaria" />
+              </div>
             </div>
           </div>
         </div>

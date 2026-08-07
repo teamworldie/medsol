@@ -1,11 +1,18 @@
 import Link from "next/link";
+import Image from "next/image";
 
 export default function Footer({ tagline = "MEDSOL · GLOBAL EXCELLENCE." }: { tagline?: string }) {
   return (
     <footer className="bg-bg-primary py-24 border-t border-medsol-blue/10 z-10 relative mt-auto">
       <div className="max-content flex flex-col md:flex-row justify-between items-center gap-12">
         <div className="space-y-4 text-center md:text-left">
-          <img src="/assets/images/medsol-logo-light.webp" alt="Medsol" className="h-8 w-auto mx-auto md:mx-0" />
+          <Image
+            src="/assets/images/medsol-logo-light.webp"
+            alt="Medsol"
+            width={148}
+            height={32}
+            className="h-8 w-auto mx-auto md:mx-0"
+          />
           <div className="text-[10px] tracking-[0.2em] uppercase text-text-secondary font-light space-y-2 mt-4">
             <p>Company number 126457</p>
             <p>Medsol Real Estate Limited.</p>

@@ -27,7 +27,7 @@ export async function requestPasswordReset(prevState: unknown, formData: FormDat
   }
 
   const ip = (await headers()).get("x-forwarded-for") ?? "unknown";
-  if (isRateLimited(`reset-request:${ip}:${email}`, 3, 15 * 60 * 1000)) {
+  if (await isRateLimited(`reset-request:${ip}:${email}`, 3, 15 * 60 * 1000)) {
     // Same generic message as success - don't reveal rate limiting to a potential enumeration attempt
     return { success: true, message: GENERIC_SUCCESS_MESSAGE };
   }

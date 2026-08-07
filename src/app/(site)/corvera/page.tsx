@@ -1,16 +1,20 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { Metadata } from "next";
 import { ArrowRight } from "lucide-react";
 import { getPropertiesByCommunity, COMMUNITIES } from "@/lib/properties";
 import InquiryForm from "@/components/site/InquiryForm";
 import Footer from "@/components/site/Footer";
 import StatusBadge from "@/components/site/StatusBadge";
+import { SITE_URL } from "@/lib/siteConfig";
 
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Corvera Hills",
   description: "Corvera Hills — pure life, pure home. New-build opportunities in Corvera Hills, Murcia.",
+  alternates: { canonical: `${SITE_URL}/corvera` },
+  openGraph: { url: `${SITE_URL}/corvera` },
 };
 
 export default async function Corvera() {
@@ -24,7 +28,7 @@ export default async function Corvera() {
           <video autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover opacity-50">
             <source src="/assets/videos/VÍDEO PROMOCIONAL NO LOGOS junio 2026.mp4" type="video/mp4" />
           </video>
-          <div className="absolute inset-0 bg-gradient-to-b from-[#0a0e17]/80 via-[#0a0e17]/40 to-bg-primary" />
+          <div className="absolute inset-0 bg-[#0a0e17]/70" />
         </div>
 
         <div className="relative z-10 text-center max-content">
@@ -68,7 +72,13 @@ export default async function Corvera() {
             </p>
           </div>
           <div className="relative aspect-square overflow-hidden group">
-            <img src="/assets/images/DSC8367@05x.webp" className="w-full h-full object-cover transition-transform duration-[2s] group-hover:scale-110" alt="Golf Lifestyle" />
+            <Image
+              src="/assets/images/DSC8367@05x.webp"
+              fill
+              sizes="(min-width: 1024px) 50vw, 100vw"
+              className="object-cover transition-transform duration-[2s] group-hover:scale-110"
+              alt="Golf Lifestyle"
+            />
             <div className="absolute inset-0 bg-medsol-blue/20 pointer-events-none" />
           </div>
         </div>
@@ -88,7 +98,13 @@ export default async function Corvera() {
             {villas.map((villa) => (
               <Link href={`/property/${villa.slug}`} key={villa.id} className="group cursor-pointer block">
                 <div className="aspect-video overflow-hidden relative mb-8">
-                  <img src={villa.featuredImage ?? ""} className="w-full h-full object-cover transition-transform duration-[2s] group-hover:scale-110" alt={villa.title} />
+                  <Image
+                    src={villa.featuredImage ?? ""}
+                    fill
+                    sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
+                    className="object-cover transition-transform duration-[2s] group-hover:scale-110"
+                    alt={villa.title}
+                  />
                   <div className="absolute inset-0 bg-medsol-blue/40 group-hover:bg-medsol-blue/10 transition-colors z-10" />
                   <StatusBadge status={villa.status} className="absolute top-4 right-4 z-20" />
                 </div>
@@ -123,7 +139,13 @@ export default async function Corvera() {
           <div className="grid lg:grid-cols-2 gap-24 items-center">
             <div className="relative group overflow-hidden h-full min-h-[400px]">
               <div className="w-full h-full absolute inset-0">
-                <img src="/assets/images/Corvera - Aneas Villas/Aneas_aerea.webp" alt="Mediterranean lifestyle" className="w-full h-full object-cover transition-transform duration-[2s] group-hover:scale-110" />
+                <Image
+                  src="/assets/images/Corvera - Aneas Villas/Aneas_aerea.webp"
+                  alt="Mediterranean lifestyle"
+                  fill
+                  sizes="(min-width: 1024px) 50vw, 100vw"
+                  className="object-cover transition-transform duration-[2s] group-hover:scale-110"
+                />
               </div>
               <div className="absolute inset-0 border-[20px] border-[#387262]/20 pointer-events-none" />
             </div>

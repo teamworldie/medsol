@@ -2,11 +2,14 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "motion/react";
 import { ArrowRight, MapPin, Wind, Sun, Shield, Settings, Heart, Waves } from "lucide-react";
 import { cn } from "@/lib/utils";
 import InquiryForm from "@/components/site/InquiryForm";
 import Footer from "@/components/site/Footer";
+
+const MotionImage = motion.create(Image);
 
 const collections = {
   omala: {
@@ -141,20 +144,20 @@ export default function Home() {
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 auto-rows-[250px] md:auto-rows-[350px]">
             <motion.div whileHover={{ scale: 0.98 }} className="col-span-2 row-span-2 overflow-hidden group relative">
-              <img src="/assets/images/Fachada diurna.webp" className="w-full h-full object-cover transition-all duration-1000" alt="Fachada diurna" />
+              <Image src="/assets/images/Fachada diurna.webp" fill sizes="(min-width: 768px) 50vw, 100vw" className="object-cover transition-all duration-1000" alt="Fachada diurna" />
               <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-all" />
             </motion.div>
             <motion.div whileHover={{ scale: 0.98 }} className="overflow-hidden group relative">
-              <img src="/assets/images/Piscina en alta sin logo.webp" className="w-full h-full object-cover transition-all duration-1000" alt="Piscina en alta sin logo" />
+              <Image src="/assets/images/Piscina en alta sin logo.webp" fill sizes="(min-width: 768px) 25vw, 50vw" className="object-cover transition-all duration-1000" alt="Piscina en alta sin logo" />
             </motion.div>
             <motion.div whileHover={{ scale: 0.98 }} className="overflow-hidden group relative">
-              <img src="/assets/images/Comedor-cocina.webp" className="w-full h-full object-cover transition-all duration-1000" alt="Comedor cocina" />
+              <Image src="/assets/images/Comedor-cocina.webp" fill sizes="(min-width: 768px) 25vw, 50vw" className="object-cover transition-all duration-1000" alt="Comedor cocina" />
             </motion.div>
             <motion.div whileHover={{ scale: 0.98 }} className="overflow-hidden group relative">
-              <img src="/assets/images/Puerta principal.webp" className="w-full h-full object-cover transition-all duration-1000" alt="Puerta principal" />
+              <Image src="/assets/images/Puerta principal.webp" fill sizes="(min-width: 768px) 25vw, 50vw" className="object-cover transition-all duration-1000" alt="Puerta principal" />
             </motion.div>
             <motion.div whileHover={{ scale: 0.98 }} className="overflow-hidden group relative">
-              <img src="/assets/images/HOTEL-5-PISCINA-1-1024x512.webp" className="w-full h-full object-cover transition-all duration-1000" alt="Hotel Piscina" />
+              <Image src="/assets/images/HOTEL-5-PISCINA-1-1024x512.webp" fill sizes="(min-width: 768px) 25vw, 50vw" className="object-cover transition-all duration-1000" alt="Hotel Piscina" />
             </motion.div>
           </div>
         </div>
@@ -196,7 +199,18 @@ export default function Home() {
             </div>
 
             <div className="relative aspect-[4/5] md:aspect-square group overflow-hidden">
-              <motion.img key={activeCollection} whileHover={{ scale: 1.05 }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8 }} src={collection.image} className="w-full h-full object-cover" alt="Main Residence" />
+              <MotionImage
+                key={activeCollection}
+                whileHover={{ scale: 1.05 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.8 }}
+                src={collection.image}
+                fill
+                sizes="(min-width: 1024px) 50vw, 100vw"
+                className="object-cover"
+                alt="Main Residence"
+              />
               <div className="absolute bottom-8 right-8 bg-medsol-gold p-8 text-bg-primary">
                 <span className="text-[10px] tracking-[0.3em] uppercase block mb-2">Featured</span>
                 <span className="text-3xl font-serif italic">{collection.featured}</span>
@@ -216,7 +230,7 @@ export default function Home() {
                 </div>
 
                 <div className="relative aspect-[4/5] group overflow-hidden">
-                  <img src={coll.image} className="w-full h-full object-cover" alt={`${key} Residence`} />
+                  <Image src={coll.image} fill sizes="100vw" className="object-cover" alt={`${key} Residence`} />
                   <div className="absolute bottom-4 right-4 bg-medsol-gold p-6 text-bg-primary">
                     <span className="text-[10px] tracking-[0.3em] uppercase block mb-1">Featured</span>
                     <span className="text-2xl font-serif italic">{coll.featured}</span>
@@ -249,7 +263,7 @@ export default function Home() {
       {/* 5. OMALA FEATURE SECTION */}
       <section className="relative h-[85vh] w-full flex items-center overflow-hidden">
         <div className="absolute inset-0 z-0 scale-105">
-          <img src="/assets/images/Omala-Residences-Slider-Home-001.webp" className="w-full h-full object-cover" alt="Omala" />
+          <Image src="/assets/images/Omala-Residences-Slider-Home-001.webp" fill sizes="100vw" className="object-cover" alt="Omala" />
           <div className="absolute inset-0 bg-medsol-blue/40 mix-blend-multiply" />
           <div className="absolute inset-0 bg-gradient-to-r from-bg-primary via-bg-primary/40 to-transparent" />
         </div>
@@ -272,7 +286,7 @@ export default function Home() {
       {/* 6. ALHAMA FEATURE SECTION */}
       <section className="relative h-[85vh] w-full flex items-center overflow-hidden">
         <div className="absolute inset-0 z-0 scale-105">
-          <img src="/assets/images/2_PS.webp" className="w-full h-full object-cover" alt="Alhama" />
+          <Image src="/assets/images/2_PS.webp" fill sizes="100vw" className="object-cover" alt="Alhama" />
           <div className="absolute inset-0 bg-[#387262]/40 mix-blend-multiply" />
           <div className="absolute inset-0 bg-gradient-to-l from-bg-primary via-bg-primary/40 to-transparent" />
         </div>
@@ -295,7 +309,7 @@ export default function Home() {
       {/* 6.5 CORVERA FEATURE SECTION */}
       <section className="relative h-[85vh] w-full flex items-center overflow-hidden">
         <div className="absolute inset-0 z-0 scale-105">
-          <img src="/assets/images/Corvera - Aneas Villas/Aneas_aerea.webp" className="w-full h-full object-cover" alt="Corvera" />
+          <Image src="/assets/images/Corvera - Aneas Villas/Aneas_aerea.webp" fill sizes="100vw" className="object-cover" alt="Corvera" />
           <div className="absolute inset-0 bg-medsol-blue/40 mix-blend-multiply" />
           <div className="absolute inset-0 bg-gradient-to-r from-bg-primary via-bg-primary/40 to-transparent" />
         </div>
@@ -344,7 +358,13 @@ export default function Home() {
               </div>
             </div>
             <div className="relative aspect-square md:aspect-video grayscale contrast-125 overflow-hidden border border-medsol-blue/10">
-              <img src="https://images.unsplash.com/photo-1524661135-423995f22d0b?auto=format&fit=crop&q=80&w=1200" className="w-full h-full object-cover" alt="Map Placeholder" />
+              <Image
+                src="https://images.unsplash.com/photo-1524661135-423995f22d0b?auto=format&fit=crop&q=80&w=1200"
+                fill
+                sizes="(min-width: 1024px) 50vw, 100vw"
+                className="object-cover"
+                alt="Map Placeholder"
+              />
               <div className="absolute inset-0 bg-medsol-blue/10 pointer-events-none" />
               <div className="absolute top-[38%] left-[48%] -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
                 <div className="w-6 h-6 bg-medsol-blue rounded-full animate-ping absolute" />
@@ -358,7 +378,7 @@ export default function Home() {
 
       {/* 8. BRAND SHOWCASE */}
       <section className="bg-bg-primary py-0 relative flex items-center justify-center overflow-hidden h-[70vh]">
-        <img src="/assets/images/Alhama-sunrise-52-scaled.webp" className="absolute inset-0 w-full h-full object-cover opacity-80" alt="Medsol Real Estate" />
+        <Image src="/assets/images/Alhama-sunrise-52-scaled.webp" fill sizes="100vw" className="object-cover opacity-80" alt="Medsol Real Estate" />
         <div className="absolute inset-0 bg-medsol-blue/60 mix-blend-multiply pointer-events-none" />
 
         <div className="relative z-10 text-center space-y-6 max-w-5xl px-8 w-full">
@@ -413,7 +433,13 @@ export default function Home() {
             <h2 className="text-6xl md:text-8xl font-serif italic">The Masterplan.</h2>
           </div>
           <div className="relative aspect-[16/6] w-full overflow-hidden grayscale hover:grayscale-0 transition-all duration-1000 cursor-zoom-in">
-            <img src="/assets/images/omala-residences-villa-antia-fachada-piscina-2.webp" className="w-full h-full object-cover object-bottom" alt="Masterplan" />
+            <Image
+              src="/assets/images/omala-residences-villa-antia-fachada-piscina-2.webp"
+              fill
+              sizes="100vw"
+              className="object-cover object-bottom"
+              alt="Masterplan"
+            />
             <div className="absolute inset-0 bg-medsol-blue/5 pointer-events-none" />
           </div>
           <p className="max-w-2xl mx-auto text-section-light-text/60 leading-loose font-light italic text-xl">

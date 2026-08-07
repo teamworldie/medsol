@@ -4,8 +4,18 @@ import { useFormState, useFormStatus } from "react-dom";
 import Link from "next/link";
 import { useState } from "react";
 import { BLOG_CATEGORIES, calculateReadTime } from "@/lib/readTime";
+import { utcToSpainDateTimeLocal, spainDateTimeLocalToUtc } from "@/lib/timezone";
+import BlogContentEditor from "./BlogContentEditor";
 
 type FormActionState = { error?: string } | undefined;
+
+// The client's standing byline for every post - pre-filled (not just a
+// placeholder) so a new post already has correct author data without the
+// admin having to remember to type it in each time.
+const DEFAULT_AUTHOR = "Lee Doherty";
+const DEFAULT_AUTHOR_TITLE = "MedSol Real Estate · Murcia property specialist";
+const DEFAULT_AUTHOR_BIO =
+  "Lee Doherty is the founder of MedSol Real Estate, working on the ground in the Region of Murcia to help UK and international buyers find homes in Murcia.";
 
 function FeaturedImageField({ initialUrl }: { initialUrl?: string | null }) {
   const [url, setUrl] = useState(initialUrl ?? "");
@@ -35,8 +45,12 @@ function FeaturedImageField({ initialUrl }: { initialUrl?: string | null }) {
   return (
     <div>
       <label className="block text-sm font-medium text-gray-700">Featured Image</label>
+      <p className="mt-1 text-xs text-gray-400">
+        Recommended ratio 16:9 (e.g. 1200×675px) - matches how it&rsquo;s cropped everywhere it&rsquo;s shown. If left
+        blank, a property photo is shown automatically until you upload a real one.
+      </p>
       <input type="hidden" name="featuredImage" value={url} />
-      <div className="mt-1 flex items-start gap-4">
+      <div className="mt-2 flex items-start gap-4">
         {url && (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={url} alt="Featured" className="h-20 w-20 rounded-md object-cover border border-gray-200" />
@@ -48,6 +62,76 @@ function FeaturedImageField({ initialUrl }: { initialUrl?: string | null }) {
             }`}
           >
             {uploading ? "Uploading..." : url ? "Replace Image" : "Upload Image"}
+            <input
+              type="file"
+              accept="image/*"
+              disabled={uploading}
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) handleFile(file);
+              }}
+            />
+          </label>
+          {url && (
+            <button
+              type="button"
+              onClick={() => setUrl("")}
+              className="ml-2 text-xs text-gray-400 hover:text-red-600"
+            >
+              Remove
+            </button>
+          )}
+          {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function AuthorAvatarField({ initialUrl }: { initialUrl?: string | null }) {
+  const [url, setUrl] = useState(initialUrl ?? "");
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleFile = async (file: File) => {
+    setUploading(true);
+    setError(null);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/media/upload", { method: "POST", body: formData });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error ?? "Upload failed.");
+        return;
+      }
+      setUrl(data.url);
+    } catch {
+      setError("Upload failed.");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  return (
+    <div>
+      <label className="block text-sm font-medium text-gray-700">Author Photo</label>
+      <input type="hidden" name="authorAvatar" value={url} />
+      <div className="mt-1 flex items-center gap-4">
+        {url ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={url} alt="Author" className="h-14 w-14 rounded-full object-cover border border-gray-200" />
+        ) : (
+          <div className="h-14 w-14 rounded-full bg-gray-100 border border-gray-200" />
+        )}
+        <div>
+          <label
+            className={`inline-flex items-center gap-2 rounded-md border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 ${
+              uploading ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-50 cursor-pointer"
+            }`}
+          >
+            {uploading ? "Uploading..." : url ? "Replace Photo" : "Upload Photo"}
             <input
               type="file"
               accept="image/*"
@@ -96,12 +180,30 @@ export default function BlogPostForm({
     seoTitle?: string | null;
     seoDescription?: string | null;
     author?: string | null;
+    authorTitle?: string | null;
+    authorAvatar?: string | null;
+    authorBio?: string | null;
+    disclaimer?: string | null;
     targetKeyword?: string | null;
     publishedAt?: Date | null;
   };
 }) {
   const [state, formAction] = useFormState(action, undefined);
   const [readTime, setReadTime] = useState(() => calculateReadTime(initial?.content ?? ""));
+  const [published, setPublished] = useState(Boolean(initial?.publishedAt));
+  const [publishAtLocal, setPublishAtLocal] = useState(() =>
+    utcToSpainDateTimeLocal(initial?.publishedAt ? new Date(initial.publishedAt) : new Date())
+  );
+  // Derived from a snapshot taken on mount/change rather than a direct
+  // Date.now() read during render, which React treats as an impure call.
+  const [isScheduled, setIsScheduled] = useState(
+    () => Boolean(initial?.publishedAt) && new Date(initial!.publishedAt!).getTime() > Date.now()
+  );
+
+  const updatePublishAt = (value: string) => {
+    setPublishAtLocal(value);
+    setIsScheduled(spainDateTimeLocalToUtc(value).getTime() > Date.now());
+  };
 
   return (
     <form action={formAction} className="space-y-6 max-w-2xl">
@@ -128,19 +230,11 @@ export default function BlogPostForm({
       <div>
         <label className="block text-sm font-medium text-gray-700">Content</label>
         <p className="mt-1 text-xs text-gray-400">
-          Plain text only (no HTML tags will be rendered). Separate paragraphs with a blank line.
-          Start a line with &quot;## &quot; for a subheading, or &quot;### &quot; for a smaller subheading.
-          Start every line of a block with &quot;- &quot; for a bulleted list. Within text, use
-          &quot;**bold**&quot; for bold and &quot;[link text](url)&quot; for a link.
+          Use the toolbar to format, or type directly - &quot;## &quot; for a heading, &quot;### &quot; for a
+          subheading, &quot;- &quot; to start a bulleted list, &quot;&gt; &quot; for a quote, &quot;**bold**&quot;
+          for bold, and &quot;[link text](url)&quot; for a link. Click Preview to see how it will look on the page.
         </p>
-        <textarea
-          name="content"
-          required
-          rows={12}
-          defaultValue={initial?.content}
-          onChange={(e) => setReadTime(calculateReadTime(e.target.value))}
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-gray-900 focus:outline-none font-mono"
-        />
+        <BlogContentEditor initialContent={initial?.content} onChange={(value) => setReadTime(calculateReadTime(value))} />
       </div>
 
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
@@ -169,37 +263,94 @@ export default function BlogPostForm({
 
       <FeaturedImageField initialUrl={initial?.featuredImage} />
 
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+      <div className="border-t border-gray-200 pt-6 space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700">Author</label>
-          <input
-            name="author"
-            placeholder="Medsol Team"
-            defaultValue={initial?.author ?? ""}
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-gray-900 focus:outline-none"
-          />
+          <h3 className="text-sm font-semibold text-gray-900">Author</h3>
+          <p className="mt-1 text-xs text-gray-400">Shown in the byline and end-of-post author box, for reader trust and search/AI-engine credibility (E-E-A-T).</p>
         </div>
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Author Name</label>
+            <input
+              name="author"
+              defaultValue={initial?.author ?? DEFAULT_AUTHOR}
+              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-gray-900 focus:outline-none"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Author Credential</label>
+            <input
+              name="authorTitle"
+              defaultValue={initial?.authorTitle ?? DEFAULT_AUTHOR_TITLE}
+              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-gray-900 focus:outline-none"
+            />
+          </div>
+        </div>
+        <AuthorAvatarField initialUrl={initial?.authorAvatar} />
         <div>
-          <label className="block text-sm font-medium text-gray-700">Target Keyword</label>
-          <input
-            name="targetKeyword"
-            placeholder="e.g. off-plan property Murcia"
-            defaultValue={initial?.targetKeyword ?? ""}
+          <label className="block text-sm font-medium text-gray-700">Author Bio</label>
+          <textarea
+            name="authorBio"
+            rows={2}
+            defaultValue={initial?.authorBio ?? DEFAULT_AUTHOR_BIO}
             className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-gray-900 focus:outline-none"
           />
-          <p className="mt-1 text-xs text-gray-400">Internal reference only - which keyword from the content plan this post targets.</p>
         </div>
       </div>
 
-      <label className="flex items-center gap-2 text-sm text-gray-700">
-        <input
-          type="checkbox"
-          name="published"
-          defaultChecked={Boolean(initial?.publishedAt)}
-          className="h-4 w-4"
+      <div>
+        <label className="block text-sm font-medium text-gray-700">Disclaimer</label>
+        <p className="mt-1 text-xs text-gray-400">Leave blank unless this post covers money, tax, legal, or visa topics.</p>
+        <textarea
+          name="disclaimer"
+          rows={2}
+          placeholder="This article is general information, not legal or financial advice. Confirm your own position with a qualified Spanish lawyer or tax adviser before you act."
+          defaultValue={initial?.disclaimer ?? ""}
+          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-gray-900 focus:outline-none"
         />
-        Published (unchecked saves as a draft)
-      </label>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700">Target Keyword</label>
+        <input
+          name="targetKeyword"
+          placeholder="e.g. off-plan property Murcia"
+          defaultValue={initial?.targetKeyword ?? ""}
+          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-gray-900 focus:outline-none"
+        />
+        <p className="mt-1 text-xs text-gray-400">Internal reference only - which keyword from the content plan this post targets.</p>
+      </div>
+
+      <div className="border-t border-gray-200 pt-6 space-y-3">
+        <label className="flex items-center gap-2 text-sm text-gray-700">
+          <input
+            type="checkbox"
+            name="published"
+            checked={published}
+            onChange={(e) => setPublished(e.target.checked)}
+            className="h-4 w-4"
+          />
+          Published (unchecked saves as a draft)
+        </label>
+
+        {published && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Publish date &amp; time (Spain time)</label>
+            <input
+              type="datetime-local"
+              name="publishedAt"
+              value={publishAtLocal}
+              onChange={(e) => updatePublishAt(e.target.value)}
+              className="mt-1 block w-full max-w-xs rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-gray-900 focus:outline-none"
+            />
+            <p className="mt-1 text-xs text-gray-400">
+              {isScheduled
+                ? "Set to a future time - this post will stay hidden from the public site and appear automatically at that moment."
+                : "Set to now or a past time - this post goes live on the public site immediately after saving."}
+            </p>
+          </div>
+        )}
+      </div>
 
       <div className="border-t border-gray-200 pt-6 space-y-4">
         <div>

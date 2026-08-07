@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
 import Footer from "@/components/site/Footer";
+import { SITE_URL } from "@/lib/siteConfig";
 
-export const metadata: Metadata = { title: "Cookie Policy" };
+export const metadata: Metadata = {
+  title: "Cookie Policy",
+  alternates: { canonical: `${SITE_URL}/cookies` },
+};
 
 export default function Cookies() {
   return (

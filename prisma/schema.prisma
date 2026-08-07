@@ -225,6 +225,10 @@ model BlogPost {
   seoTitle      String?  // Auto-generated on create, editable afterward
   seoDescription String? // Auto-generated on create, editable afterward
   author        String?  // Byline shown on the public post
+  authorTitle   String?  // Credential line under the byline, e.g. "Murcia Property Specialist"
+  authorAvatar  String?  // Headshot URL, shown in the byline and end-of-post author box
+  authorBio     String?  // Full bio sentence for the end-of-post author box
+  disclaimer    String?  // Shown above the author box - set on money/tax/legal/visa posts only
   targetKeyword String?  // Internal SEO tracking - which content-plan keyword this post targets
   featuredImage String?
   category      String?

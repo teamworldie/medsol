@@ -12,7 +12,7 @@ export async function authenticate(
   const ip = (await headers()).get("x-forwarded-for") ?? "unknown";
   const email = String(formData.get("email") ?? "").toLowerCase();
 
-  if (isRateLimited(`login:${ip}:${email}`, 5, 5 * 60 * 1000)) {
+  if (await isRateLimited(`login:${ip}:${email}`, 5, 5 * 60 * 1000)) {
     return "Too many attempts. Please wait a few minutes and try again.";
   }
 

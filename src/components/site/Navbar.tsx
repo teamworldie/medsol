@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
 import { cn } from "@/lib/utils";
@@ -43,18 +44,27 @@ export default function Navbar() {
 
   const enquireHref = pathname === "/" || pathname.startsWith("/villa") || pathname.startsWith("/property") ? "#contact" : "/#contact";
 
+  // The journal pages use a light editorial background rather than a dark
+  // hero image, so the navbar can't rely on being transparent-over-dark
+  // until scroll - white nav text would be unreadable on light content.
+  const forceSolidNav = pathname === "/journal" || pathname.startsWith("/journal/");
+  const solidNav = isScrolled || forceSolidNav;
+
   return (
     <>
       <nav
         className={cn(
           "fixed top-0 left-0 w-full z-50 transition-all duration-700 px-8 md:px-16 py-6 md:py-8 flex justify-between items-center",
-          isScrolled ? "bg-bg-primary/90 backdrop-blur-md py-4 md:py-5 border-b border-white/5" : "bg-transparent"
+          solidNav ? "bg-bg-primary/90 backdrop-blur-md py-4 md:py-5 border-b border-white/5" : "bg-transparent"
         )}
       >
         <Link href="/" className="flex items-center group">
-          <img
+          <Image
             src="/assets/images/medsol-logo-light.webp"
             alt="Medsol"
+            width={185}
+            height={40}
+            priority
             className="h-10 w-auto transition-transform duration-500 group-hover:scale-105"
           />
         </Link>

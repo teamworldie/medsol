@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
 import Footer from "@/components/site/Footer";
+import { SITE_URL } from "@/lib/siteConfig";
 
-export const metadata: Metadata = { title: "Legal Information" };
+export const metadata: Metadata = {
+  title: "Legal Information",
+  alternates: { canonical: `${SITE_URL}/legal-info` },
+};
 
 export default function LegalInfo() {
   return (

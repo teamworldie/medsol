@@ -103,7 +103,7 @@ export async function submitLead(prevState: unknown, formData: FormData) {
 
     // In a Vercel preview with ephemeral SQLite, this might fail, so we wrap it in a try/catch
     try {
-      await prisma.lead.create({
+      const lead = await prisma.lead.create({
         data: {
           name,
           email,
@@ -115,6 +115,13 @@ export async function submitLead(prevState: unknown, formData: FormData) {
           status: "NEW",
         },
       });
+      // Mirror the inquiry into Message so it shows up in the admin Messages
+      // inbox and in this lead's conversation history, not just as a notes field.
+      if (message) {
+        await prisma.message.create({
+          data: { leadId: lead.id, content: message, source: "CONTACT_FORM" },
+        });
+      }
       await sendLeadNotificationEmail({ name, email, phone: phone || null, source, inquiryType, notes: message || null });
     } catch (e) {
       console.error("Prisma failed to save lead on Vercel preview:", e);
@@ -174,7 +181,7 @@ export async function createLead(prevState: CreateLeadState, formData: FormData)
     return { error: "One of the fields is too long." };
   }
 
-  await prisma.lead.create({
+  const lead = await prisma.lead.create({
     data: {
       name,
       email,
@@ -187,6 +194,11 @@ export async function createLead(prevState: CreateLeadState, formData: FormData)
       notes,
     },
   });
+  if (notes) {
+    await prisma.message.create({
+      data: { leadId: lead.id, content: notes, source },
+    });
+  }
 
   await sendLeadNotificationEmail({ name, email, phone, source, inquiryType, notes });
 

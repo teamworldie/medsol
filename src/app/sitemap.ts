@@ -9,6 +9,7 @@ const STATIC_PATHS = [
   "/omala-residences",
   "/alhama-nature",
   "/corvera",
+  "/santa-rosalia",
   "/journal",
   "/contact",
   "/privacy-policy",

@@ -7,7 +7,7 @@ type MessageRow = {
   content: string;
   source: string;
   isAiResponse: boolean;
-  lead: { name: string } | null;
+  lead: { name: string; email: string | null; phone: string | null } | null;
   createdAt: Date;
 };
 
@@ -25,9 +25,9 @@ export default async function MessagesPage() {
     // eslint-disable-next-line react-hooks/purity -- fallback-data path in a Server Component, not client render code
     const now = Date.now();
     messages = [
-      { id: "1", leadId: "1", content: "Hi, I'm interested in the Sample Property A listing, is it still available?", source: "WEB_CHAT", isAiResponse: false, lead: { name: "Alice Johnson" }, createdAt: new Date(now) },
-      { id: "2", leadId: "1", content: "Thanks for reaching out! Yes, Sample Property A is still available. Would you like to schedule a viewing?", source: "AI", isAiResponse: true, lead: { name: "Alice Johnson" }, createdAt: new Date(now - 3600000) },
-      { id: "3", leadId: "2", content: "Looking for a 3 bedroom townhouse under €700k in Puerto Banús.", source: "CONTACT_FORM", isAiResponse: false, lead: { name: "Bob Smith" }, createdAt: new Date(now - 86400000) },
+      { id: "1", leadId: "1", content: "Hi, I'm interested in the Sample Property A listing, is it still available?", source: "WEB_CHAT", isAiResponse: false, lead: { name: "Alice Johnson", email: "alice@example.com", phone: "+420 123 456 789" }, createdAt: new Date(now) },
+      { id: "2", leadId: "1", content: "Thanks for reaching out! Yes, Sample Property A is still available. Would you like to schedule a viewing?", source: "AI", isAiResponse: true, lead: { name: "Alice Johnson", email: "alice@example.com", phone: "+420 123 456 789" }, createdAt: new Date(now - 3600000) },
+      { id: "3", leadId: "2", content: "Looking for a 3 bedroom townhouse under €700k in Puerto Banús.", source: "CONTACT_FORM", isAiResponse: false, lead: { name: "Bob Smith", email: "bob@example.com", phone: "+44 7700 900077" }, createdAt: new Date(now - 86400000) },
     ];
   }
 
@@ -43,6 +43,8 @@ export default async function MessagesPage() {
           id: m.id,
           leadId: m.leadId,
           leadName: m.lead?.name ?? "Unknown",
+          leadEmail: m.lead?.email ?? null,
+          leadPhone: m.lead?.phone ?? null,
           content: m.content,
           source: m.source,
           isAiResponse: m.isAiResponse,

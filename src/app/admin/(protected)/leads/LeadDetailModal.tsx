@@ -26,6 +26,33 @@ type LeadDetail = {
 };
 
 type LeadNoteItem = { id: string; content: string; createdAt: string };
+type MessageItem = { id: string; content: string; source: string; isAiResponse: boolean; createdAt: string };
+
+function ConversationSection({ messages }: { messages: MessageItem[] }) {
+  if (messages.length === 0) return null;
+  return (
+    <div className="col-span-2 space-y-3">
+      <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-gray-400">Conversation History</p>
+      <div className="space-y-3 max-h-48 overflow-y-auto pr-1">
+        {messages.map((m) => (
+          <div key={m.id} className="flex items-start gap-3">
+            <span
+              className={`mt-0.5 inline-flex shrink-0 items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                m.isAiResponse ? "bg-purple-100 text-purple-800" : "bg-gray-200 text-gray-700"
+              }`}
+            >
+              {m.source.replace(/_/g, " ")}
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm text-gray-800 whitespace-pre-wrap">{m.content}</p>
+              <p className="text-xs text-gray-400 mt-0.5">{new Date(m.createdAt).toLocaleString()}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 function Field({ label, value }: { label: string; value: string | number | null | undefined }) {
   if (value === null || value === undefined || value === "") return null;
@@ -95,8 +122,18 @@ function NotesSection({ leadId, notes }: { leadId: string; notes: LeadNoteItem[]
   );
 }
 
-export default function LeadDetailModal({ lead, leadNotes }: { lead: LeadDetail; leadNotes: LeadNoteItem[] }) {
-  const [open, setOpen] = useState(false);
+export default function LeadDetailModal({
+  lead,
+  leadNotes,
+  messages,
+  autoOpen,
+}: {
+  lead: LeadDetail;
+  leadNotes: LeadNoteItem[];
+  messages: MessageItem[];
+  autoOpen?: boolean;
+}) {
+  const [open, setOpen] = useState(autoOpen ?? false);
   const [isMarking, startMarking] = useTransition();
   const [lastContactedAt, setLastContactedAt] = useState(lead.lastContactedAt);
 
@@ -172,6 +209,7 @@ export default function LeadDetailModal({ lead, leadNotes }: { lead: LeadDetail;
                   <p className="text-sm text-gray-900 mt-0.5 whitespace-pre-wrap">{lead.notes}</p>
                 </div>
               )}
+              <ConversationSection messages={messages} />
               <NotesSection leadId={lead.id} notes={leadNotes} />
               {lead.aiSummary && (
                 <div className="col-span-2">

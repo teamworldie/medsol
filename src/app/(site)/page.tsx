@@ -63,10 +63,36 @@ const collections = {
     image: "/assets/images/Corvera - Aneas Apartments/ANEAS APARTMENTS_terraza atico.webp",
     featured: "Aneas Apartments",
   },
+  santaRosalia: {
+    heading: (
+      <>
+        <span>Life Around</span> <br /> <span className="text-medsol-gold-soft">Europe&apos;s Largest Lagoon.</span>
+      </>
+    ),
+    description:
+      "Santa Rosalia Lake & Life Resort is a brand-new, family-focused community built around a 16,000m² Crystal Lagoon — Europe's largest man-made lake, with turquoise waters and white sandy beaches. Just 15 minutes from Murcia Airport, with a beachfront clubhouse, adventure golf, and 24-hour gated security.",
+    stats: [
+      { label: "Lagoon", value: "16,000m² Crystal Lagoon" },
+      { label: "Residences", value: "1,200+ Villas & Apartments" },
+      { label: "Airport", value: "15-30 Minutes" },
+      { label: "Security", value: "24/7 Gated" },
+    ],
+    image: "/assets/images/Santa-Rosalia/santa-rosalia-lagoon-view.jpg",
+    featured: "Romero 17 Villas",
+  },
+};
+
+// Path/short-label lookup so a new collection only needs one entry here,
+// rather than extending a ternary chain at every "Explore X" link.
+const communityPaths: Record<keyof typeof collections, { href: string; label: string }> = {
+  omala: { href: "/omala-residences", label: "Omala" },
+  alhama: { href: "/alhama-nature", label: "Alhama" },
+  corvera: { href: "/corvera", label: "Corvera" },
+  santaRosalia: { href: "/santa-rosalia", label: "Santa Rosalia" },
 };
 
 export default function Home() {
-  const [activeCollection, setActiveCollection] = useState<"omala" | "alhama" | "corvera">("omala");
+  const [activeCollection, setActiveCollection] = useState<keyof typeof collections>("omala");
   const collection = collections[activeCollection];
 
   return (
@@ -95,6 +121,9 @@ export default function Home() {
               </Link>
               <Link href="/corvera" className="group flex items-center gap-4 text-[11px] tracking-[0.3em] uppercase bg-medsol-blue px-10 py-5 hover:bg-medsol-blue-light transition-all duration-500">
                 Corvera Hills <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </Link>
+              <Link href="/santa-rosalia" className="group flex items-center gap-4 text-[11px] tracking-[0.3em] uppercase bg-medsol-blue px-10 py-5 hover:bg-medsol-blue-light transition-all duration-500">
+                Santa Rosalia <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Link>
             </div>
           </motion.div>
@@ -174,6 +203,7 @@ export default function Home() {
                   <button onClick={() => setActiveCollection("omala")} className={cn("text-[10px] tracking-[0.3em] uppercase font-bold pb-4 transition-colors whitespace-nowrap", activeCollection === "omala" ? "text-medsol-gold" : "text-text-secondary hover:text-medsol-gold")}>Omala</button>
                   <button onClick={() => setActiveCollection("alhama")} className={cn("text-[10px] tracking-[0.3em] uppercase font-bold pb-4 transition-colors whitespace-nowrap", activeCollection === "alhama" ? "text-medsol-gold" : "text-text-secondary hover:text-medsol-gold")}>Alhama</button>
                   <button onClick={() => setActiveCollection("corvera")} className={cn("text-[10px] tracking-[0.3em] uppercase font-bold pb-4 transition-colors whitespace-nowrap", activeCollection === "corvera" ? "text-medsol-gold" : "text-text-secondary hover:text-medsol-gold")}>Corvera</button>
+                  <button onClick={() => setActiveCollection("santaRosalia")} className={cn("text-[10px] tracking-[0.3em] uppercase font-bold pb-4 transition-colors whitespace-nowrap", activeCollection === "santaRosalia" ? "text-medsol-gold" : "text-text-secondary hover:text-medsol-gold")}>Santa Rosalia</button>
                 </div>
                 <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif leading-tight">{collection.heading}</h2>
               </div>
@@ -188,9 +218,9 @@ export default function Home() {
                 ))}
               </div>
 
-              <Link href={activeCollection === "omala" ? "/omala-residences" : activeCollection === "alhama" ? "/alhama-nature" : "/corvera"} className="flex items-center gap-6 group">
+              <Link href={communityPaths[activeCollection].href} className="flex items-center gap-6 group">
                 <span className="text-[12px] tracking-[0.3em] uppercase">
-                  Explore {activeCollection === "omala" ? "Omala" : activeCollection === "alhama" ? "Alhama" : "Corvera"}
+                  Explore {communityPaths[activeCollection].label}
                 </span>
                 <div className="w-16 h-16 rounded-full border border-medsol-gold flex items-center justify-center group-hover:bg-medsol-gold transition-all duration-500">
                   <ArrowRight className="w-6 h-6 text-medsol-gold group-hover:text-bg-primary transition-colors" />
@@ -248,8 +278,8 @@ export default function Home() {
                   ))}
                 </div>
 
-                <Link href={key === "omala" ? "/omala-residences" : key === "alhama" ? "/alhama-nature" : "/corvera"} className="flex items-center gap-6 group">
-                  <span className="text-[12px] tracking-[0.3em] uppercase">Explore {key}</span>
+                <Link href={communityPaths[key].href} className="flex items-center gap-6 group">
+                  <span className="text-[12px] tracking-[0.3em] uppercase">Explore {communityPaths[key].label}</span>
                   <div className="w-16 h-16 rounded-full border border-medsol-gold flex items-center justify-center group-hover:bg-medsol-gold transition-all duration-500">
                     <ArrowRight className="w-6 h-6 text-medsol-gold group-hover:text-bg-primary transition-colors" />
                   </div>
@@ -264,8 +294,9 @@ export default function Home() {
       <section className="relative h-[85vh] w-full flex items-center overflow-hidden">
         <div className="absolute inset-0 z-0 scale-105">
           <Image src="/assets/images/Omala-Residences-Slider-Home-001.webp" fill sizes="100vw" className="object-cover" alt="Omala" />
-          <div className="absolute inset-0 bg-medsol-blue/40 mix-blend-multiply" />
-          <div className="absolute inset-0 bg-gradient-to-r from-bg-primary via-bg-primary/40 to-transparent" />
+          <div className="absolute inset-0 bg-[#0a0e17]/85 md:hidden" />
+          <div className="absolute inset-0 bg-medsol-blue/40 mix-blend-multiply hidden md:block" />
+          <div className="absolute inset-0 bg-gradient-to-r from-bg-primary via-bg-primary/40 to-transparent hidden md:block" />
         </div>
         <div className="max-content relative z-10">
           <div className="max-w-4xl space-y-10">
@@ -287,8 +318,9 @@ export default function Home() {
       <section className="relative h-[85vh] w-full flex items-center overflow-hidden">
         <div className="absolute inset-0 z-0 scale-105">
           <Image src="/assets/images/2_PS.webp" fill sizes="100vw" className="object-cover" alt="Alhama" />
-          <div className="absolute inset-0 bg-[#387262]/40 mix-blend-multiply" />
-          <div className="absolute inset-0 bg-gradient-to-l from-bg-primary via-bg-primary/40 to-transparent" />
+          <div className="absolute inset-0 bg-[#0a0e17]/85 md:hidden" />
+          <div className="absolute inset-0 bg-[#387262]/40 mix-blend-multiply hidden md:block" />
+          <div className="absolute inset-0 bg-gradient-to-l from-bg-primary via-bg-primary/40 to-transparent hidden md:block" />
         </div>
         <div className="max-content relative z-10 text-right">
           <div className="max-w-4xl ml-auto space-y-10 md:pr-8">
@@ -310,8 +342,9 @@ export default function Home() {
       <section className="relative h-[85vh] w-full flex items-center overflow-hidden">
         <div className="absolute inset-0 z-0 scale-105">
           <Image src="/assets/images/Corvera - Aneas Villas/Aneas_aerea.webp" fill sizes="100vw" className="object-cover" alt="Corvera" />
-          <div className="absolute inset-0 bg-medsol-blue/40 mix-blend-multiply" />
-          <div className="absolute inset-0 bg-gradient-to-r from-bg-primary via-bg-primary/40 to-transparent" />
+          <div className="absolute inset-0 bg-[#0a0e17]/85 md:hidden" />
+          <div className="absolute inset-0 bg-medsol-blue/40 mix-blend-multiply hidden md:block" />
+          <div className="absolute inset-0 bg-gradient-to-r from-bg-primary via-bg-primary/40 to-transparent hidden md:block" />
         </div>
         <div className="max-content relative z-10">
           <div className="max-w-4xl space-y-10">
@@ -324,6 +357,30 @@ export default function Home() {
             </p>
             <Link href="/corvera" className="inline-flex py-4 px-12 bg-white text-medsol-blue text-[11px] tracking-[0.3em] uppercase hover:bg-medsol-gold hover:text-white transition-all font-bold">
               Explore Corvera
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* 6.6 SANTA ROSALIA FEATURE SECTION */}
+      <section className="relative h-[85vh] w-full flex items-center overflow-hidden">
+        <div className="absolute inset-0 z-0 scale-105">
+          <Image src="/assets/images/Santa-Rosalia/rosalia.avif" fill sizes="100vw" className="object-cover" alt="Santa Rosalia Lake & Life Resort" />
+          <div className="absolute inset-0 bg-[#0a0e17]/85 md:hidden" />
+          <div className="absolute inset-0 bg-[#387262]/40 mix-blend-multiply hidden md:block" />
+          <div className="absolute inset-0 bg-gradient-to-l from-bg-primary via-bg-primary/40 to-transparent hidden md:block" />
+        </div>
+        <div className="max-content relative z-10 text-right">
+          <div className="max-w-4xl ml-auto space-y-10 md:pr-8">
+            <span className="text-medsol-gold text-[12px] tracking-[0.5em] uppercase">Santa Rosalia Lake &amp; Life</span>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-serif italic leading-none">
+              Europe&apos;s Largest <br /> Crystal Lagoon.
+            </h2>
+            <p className="text-text-secondary text-lg leading-relaxed font-light">
+              A brand-new, family-focused resort built around a 16,000m² turquoise lagoon with white sandy beaches — plus adventure golf, beach volleyball and a beachfront clubhouse.
+            </p>
+            <Link href="/santa-rosalia" className="inline-flex py-4 px-12 bg-[#D6B06A] text-bg-primary text-[11px] tracking-[0.3em] uppercase hover:bg-white transition-all font-bold">
+              Explore Santa Rosalia
             </Link>
           </div>
         </div>

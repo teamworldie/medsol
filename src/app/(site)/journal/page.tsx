@@ -17,9 +17,21 @@ export const metadata: Metadata = {
 
 export default async function JournalPage() {
   const posts = await getPublishedPosts();
-  const cardImages = await Promise.all(
-    posts.map(async (post) => post.featuredImage || (await getPlaceholderImage(post.id)))
-  );
+  // Sequential (not Promise.all) so each fallback pick can exclude every
+  // image already assigned so far - avoids two posts landing on the same
+  // placeholder photo side by side. In practice every post already has a
+  // real featuredImage saved (see actions/blog.ts), so this rarely runs.
+  const usedImages = posts.map((p) => p.featuredImage).filter((url): url is string => Boolean(url));
+  const cardImages: (string | null)[] = [];
+  for (const post of posts) {
+    if (post.featuredImage) {
+      cardImages.push(post.featuredImage);
+      continue;
+    }
+    const image = await getPlaceholderImage(post.id, usedImages);
+    if (image) usedImages.push(image);
+    cardImages.push(image);
+  }
 
   return (
     <main className="bg-[#FAF7F2] pt-32 relative overflow-x-hidden">
@@ -56,6 +68,16 @@ export default async function JournalPage() {
                   </div>
                   <div className="space-y-3">
                     <div className="flex items-center gap-4 text-[10px] tracking-[0.2em] uppercase text-medsol-blue">
+                      {post.publishedAt && (
+                        <span>
+                          {new Date(post.publishedAt).toLocaleDateString("en-GB", {
+                            day: "numeric",
+                            month: "long",
+                            year: "numeric",
+                          })}
+                        </span>
+                      )}
+                      {post.publishedAt && post.category && <span className="text-gray-300">|</span>}
                       {post.category && <span>{post.category}</span>}
                       {post.category && post.readTime && <span className="text-gray-300">|</span>}
                       {post.readTime && <span>{post.readTime}</span>}

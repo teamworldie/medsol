@@ -25,10 +25,10 @@ export default async function Corvera() {
       {/* 1. HERO SECTION */}
       <section className="relative h-screen w-full flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0 pointer-events-none">
-          <video autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover opacity-50">
-            <source src="/assets/videos/VÍDEO PROMOCIONAL NO LOGOS junio 2026.mp4" type="video/mp4" />
+          <video autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover opacity-60">
+            <source src="/assets/videos/corvera-promo.mp4" type="video/mp4" />
           </video>
-          <div className="absolute inset-0 bg-[#0a0e17]/70" />
+          <div className="absolute inset-0 bg-[#0a0e17]/60" />
         </div>
 
         <div className="relative z-10 text-center max-content">

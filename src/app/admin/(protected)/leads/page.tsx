@@ -30,20 +30,24 @@ type LeadRow = {
   createdAt: Date;
   tags: { id: string; name: string; color: string }[];
   leadNotes: { id: string; content: string; createdAt: Date }[];
+  messages: { id: string; content: string; source: string; isAiResponse: boolean; createdAt: Date }[];
 };
 
 export default async function LeadsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ tag?: string; page?: string }>;
+  searchParams: Promise<{ tag?: string; page?: string; leadId?: string }>;
 }) {
-  const { tag, page: pageParam } = await searchParams;
+  const { tag, page: pageParam, leadId } = await searchParams;
   const page = Math.max(1, Number(pageParam) || 1);
   let leads: LeadRow[] = [];
   let allTags: { id: string; name: string; color: string }[] = [];
   let total = 0;
 
-  const where = tag ? { tags: { some: { name: tag } } } : undefined;
+  // Jumping in from a specific message (Messages tab "View Contact") - show
+  // just that lead, regardless of the current tag filter or pagination, so
+  // the link always lands on the right contact.
+  const where = leadId ? { id: leadId } : tag ? { tags: { some: { name: tag } } } : undefined;
 
   try {
     let count: number;
@@ -51,9 +55,13 @@ export default async function LeadsPage({
       prisma.lead.findMany({
         where,
         orderBy: { createdAt: "desc" },
-        include: { tags: true, leadNotes: { orderBy: { createdAt: "desc" } } },
-        skip: (page - 1) * PAGE_SIZE,
-        take: PAGE_SIZE,
+        include: {
+          tags: true,
+          leadNotes: { orderBy: { createdAt: "desc" } },
+          messages: { orderBy: { createdAt: "asc" } },
+        },
+        skip: leadId ? 0 : (page - 1) * PAGE_SIZE,
+        take: leadId ? 1 : PAGE_SIZE,
       }),
       prisma.lead.count({ where }),
       prisma.tag.findMany({ orderBy: { name: "asc" } }),
@@ -77,6 +85,7 @@ export default async function LeadsPage({
       aiSummary: null,
       lastContactedAt: null,
       leadNotes: [],
+      messages: [],
     };
     leads = [
       { id: "1", name: "Alice Johnson", email: "alice@example.com", phone: "+420 123 456 789", source: "CONTACT_FORM", status: "NEW", createdAt: new Date(now), tags: [], ...emptyLeadDetails },
@@ -94,10 +103,18 @@ export default async function LeadsPage({
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Leads</h1>
-          <p className="text-gray-500 mt-1">Manage all your incoming inquiries and contacts.</p>
+          <p className="text-gray-500 mt-1">
+            {leadId ? "Showing a single contact." : "Manage all your incoming inquiries and contacts."}
+          </p>
         </div>
         <div className="flex items-center gap-4">
-          <SegmentFilter tags={allTags} activeTag={tag ?? null} />
+          {leadId ? (
+            <Link href="/admin/leads" className="text-sm font-medium text-gray-600 hover:text-gray-900">
+              ← Back to all leads
+            </Link>
+          ) : (
+            <SegmentFilter tags={allTags} activeTag={tag ?? null} />
+          )}
           <Link
             href="/admin/leads/new"
             className="rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 transition-colors whitespace-nowrap"
@@ -206,6 +223,14 @@ export default async function LeadsPage({
                             content: n.content,
                             createdAt: new Date(n.createdAt).toISOString(),
                           }))}
+                          messages={lead.messages.map((m) => ({
+                            id: m.id,
+                            content: m.content,
+                            source: m.source,
+                            isAiResponse: m.isAiResponse,
+                            createdAt: new Date(m.createdAt).toISOString(),
+                          }))}
+                          autoOpen={lead.id === leadId}
                         />
                         <LeadRowActions
                           leadId={lead.id}

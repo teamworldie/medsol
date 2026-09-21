@@ -6,7 +6,7 @@ import { ArrowLeft } from "lucide-react";
 import { getPublishedPostBySlug, getRelatedPosts } from "@/lib/journal";
 import { getPlaceholderImage } from "@/lib/blogPlaceholderImage";
 import { parseBlogContent, parseInlineSpans, autoLinkSpans, AUTO_LINK_ENTITIES, type BlogContentBlock, type InlineSpan } from "@/lib/blogContent";
-import { SITE_NAME, SITE_URL } from "@/lib/siteConfig";
+import { SITE_NAME, SITE_URL, stripSiteNameSuffix } from "@/lib/siteConfig";
 import { SPAIN_TZ } from "@/lib/timezone";
 import Footer from "@/components/site/Footer";
 import ShareBar from "@/components/site/ShareBar";
@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const post = await getPublishedPostBySlug(slug);
   if (!post) return { title: "Post Not Found" };
 
-  const title = post.seoTitle || post.title;
+  const title = stripSiteNameSuffix(post.seoTitle || post.title);
   const description = post.seoDescription || post.excerpt || undefined;
   const postUrl = `${SITE_URL}/journal/${post.slug}`;
   const displayImage = post.featuredImage || (await getPlaceholderImage(post.id));
@@ -137,9 +137,21 @@ export default async function JournalPostPage({ params }: { params: Promise<{ sl
   const faqPairs = extractFaqPairs(blocks);
   const relatedPosts = await getRelatedPosts(post.slug, post.category);
   const displayImage = post.featuredImage || (await getPlaceholderImage(post.id));
-  const relatedImages = await Promise.all(
-    relatedPosts.map(async (related) => related.featuredImage || (await getPlaceholderImage(related.id)))
-  );
+  // Sequential so each related-post fallback excludes the main post's image
+  // and every related image already picked - avoids duplicate photos in
+  // the "Related reading" row. In practice every post already has a real
+  // featuredImage saved, so this fallback rarely runs.
+  const usedImages = [displayImage, ...relatedPosts.map((p) => p.featuredImage)].filter((url): url is string => Boolean(url));
+  const relatedImages: (string | null)[] = [];
+  for (const related of relatedPosts) {
+    if (related.featuredImage) {
+      relatedImages.push(related.featuredImage);
+      continue;
+    }
+    const image = await getPlaceholderImage(related.id, usedImages);
+    if (image) usedImages.push(image);
+    relatedImages.push(image);
+  }
 
   // The plan's "answer-first" tactic: if the post opens with a paragraph
   // before any heading, treat it as the direct-answer lede and style it

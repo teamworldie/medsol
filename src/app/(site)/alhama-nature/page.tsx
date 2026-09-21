@@ -33,7 +33,7 @@ export default async function AlhamaNature() {
             sizes="100vw"
             className="object-cover opacity-60"
           />
-          <div className="absolute inset-0 bg-[#0a0e17]/70" />
+          <div className="absolute inset-0 bg-[#0a0e17]/60" />
         </div>
 
         <div className="relative z-10 text-center max-content">

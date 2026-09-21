@@ -18,16 +18,42 @@ function hashString(input: string): number {
  * (hashes `seed`, normally the post id/slug) rather than truly random, so
  * the same post shows the same placeholder on every request/share instead
  * of flickering between images - important since this also feeds og:image.
+ *
+ * Draws from every property's full gallery, not just its one featuredImage -
+ * with 11 properties but dozens of blog posts, the featuredImage-only pool
+ * (11 photos) runs out fast and forces repeats; the combined gallery pool
+ * (100+) gives enough headroom that distinct-image assignment holds for a
+ * realistic content calendar.
+ *
+ * `excludeUrls` lets the caller keep this pick distinct from images already
+ * assigned to other posts (e.g. on /journal, several cards side by side) -
+ * without it, two posts can independently hash to the same photo. Falls
+ * back to allowing a repeat only once every image is already taken.
  */
-export async function getPlaceholderImage(seed: string): Promise<string | null> {
+export async function getPlaceholderImage(seed: string, excludeUrls: string[] = []): Promise<string | null> {
   const properties = await prisma.property.findMany({
-    where: { featuredImage: { not: null } },
-    select: { featuredImage: true },
+    select: { featuredImage: true, images: true },
     orderBy: { createdAt: "asc" },
   });
 
-  const images = properties.map((p) => p.featuredImage).filter((url): url is string => Boolean(url));
-  if (images.length === 0) return null;
+  const allImages: string[] = [];
+  for (const property of properties) {
+    if (property.featuredImage) allImages.push(property.featuredImage);
+    if (property.images) {
+      try {
+        const gallery = JSON.parse(property.images) as string[];
+        if (Array.isArray(gallery)) allImages.push(...gallery.filter((url) => typeof url === "string"));
+      } catch {
+        // Malformed JSON on a property record - skip its gallery, featuredImage above still counts.
+      }
+    }
+  }
+  const uniqueImages = Array.from(new Set(allImages));
+  if (uniqueImages.length === 0) return null;
 
-  return images[hashString(seed) % images.length];
+  const excluded = new Set(excludeUrls);
+  const available = uniqueImages.filter((url) => !excluded.has(url));
+  const pool = available.length > 0 ? available : uniqueImages;
+
+  return pool[hashString(seed) % pool.length];
 }

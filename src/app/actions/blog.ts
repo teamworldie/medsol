@@ -9,6 +9,7 @@ import { slugify } from "@/lib/slug";
 import { calculateReadTime } from "@/lib/readTime";
 import { SITE_NAME } from "@/lib/siteConfig";
 import { spainDateTimeLocalToUtc } from "@/lib/timezone";
+import { getPlaceholderImage } from "@/lib/blogPlaceholderImage";
 
 async function uniqueSlug(title: string, ignoreId?: string): Promise<string> {
   const base = slugify(title) || "post";
@@ -83,14 +84,24 @@ export async function createBlogPost(prevState: unknown, formData: FormData) {
   if ("error" in parsed) return { success: false, error: parsed.error };
 
   let slug = await uniqueSlug(parsed.data.title);
+  // Every post gets a real featuredImage in the database, not just a
+  // render-time fallback - a random (but stable, keyed on slug) property
+  // photo when the admin doesn't upload one, so /journal never shows a
+  // blank card and the value is consistent everywhere (including og:image).
+  // Excludes images already used by other posts so two posts don't land on
+  // the same photo side by side on /journal.
+  const usedImages = await prisma.blogPost.findMany({ where: { featuredImage: { not: null } }, select: { featuredImage: true } });
+  const featuredImage =
+    parsed.data.featuredImage ||
+    (await getPlaceholderImage(slug, usedImages.map((p) => p.featuredImage as string)));
 
   try {
-    await prisma.blogPost.create({ data: { ...parsed.data, slug } });
+    await prisma.blogPost.create({ data: { ...parsed.data, featuredImage, slug } });
   } catch (e) {
     if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2002") {
       // Another request claimed this slug between our check and our insert - retry once with a unique suffix.
       slug = `${slug}-${Date.now().toString(36)}`;
-      await prisma.blogPost.create({ data: { ...parsed.data, slug } });
+      await prisma.blogPost.create({ data: { ...parsed.data, featuredImage, slug } });
     } else {
       throw e;
     }
@@ -106,7 +117,18 @@ export async function updateBlogPost(id: string, prevState: unknown, formData: F
   const parsed = readBlogForm(formData);
   if ("error" in parsed) return { success: false, error: parsed.error };
 
-  await prisma.blogPost.update({ where: { id }, data: parsed.data });
+  // Same as create: never save a blank featuredImage - fall back to a
+  // stable random property photo (keyed on the post id) if it's cleared,
+  // excluding images already used by other posts.
+  const usedImages = await prisma.blogPost.findMany({
+    where: { featuredImage: { not: null }, id: { not: id } },
+    select: { featuredImage: true },
+  });
+  const featuredImage =
+    parsed.data.featuredImage ||
+    (await getPlaceholderImage(id, usedImages.map((p) => p.featuredImage as string)));
+
+  await prisma.blogPost.update({ where: { id }, data: { ...parsed.data, featuredImage } });
 
   revalidatePath("/admin/blog");
   revalidatePath("/journal");

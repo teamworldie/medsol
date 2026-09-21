@@ -12,6 +12,7 @@ const links = [
   { href: "/omala-residences", label: "OMALA" },
   { href: "/alhama-nature", label: "ALHAMA" },
   { href: "/corvera", label: "CORVERA" },
+  { href: "/santa-rosalia", label: "ROSALIA" },
   { href: "/journal", label: "JOURNAL" },
   { href: "/contact", label: "CONTACT" },
 ];
@@ -58,7 +59,7 @@ export default function Navbar() {
           solidNav ? "bg-bg-primary/90 backdrop-blur-md py-4 md:py-5 border-b border-white/5" : "bg-transparent"
         )}
       >
-        <Link href="/" className="flex items-center group">
+        <Link href="/" className="flex items-center group shrink-0">
           <Image
             src="/assets/images/medsol-logo-light.webp"
             alt="Medsol"
@@ -69,7 +70,7 @@ export default function Navbar() {
           />
         </Link>
 
-        <div className="hidden md:flex items-center gap-12">
+        <div className="hidden lg:flex items-center gap-12">
           {links.map((link) => (
             <Link
               key={link.href}
@@ -94,7 +95,7 @@ export default function Navbar() {
         </div>
 
         <button
-          className="md:hidden fixed top-6 right-8 flex flex-col items-end justify-center w-8 h-8 gap-2 z-[60]"
+          className="lg:hidden fixed top-6 right-8 flex flex-col items-end justify-center w-8 h-8 gap-2 z-[60]"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           aria-label="Toggle Menu"
         >

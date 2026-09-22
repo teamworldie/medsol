@@ -10,6 +10,7 @@ import { SITE_NAME, SITE_URL, stripSiteNameSuffix } from "@/lib/siteConfig";
 import { SPAIN_TZ } from "@/lib/timezone";
 import Footer from "@/components/site/Footer";
 import ShareBar from "@/components/site/ShareBar";
+import InquiryForm from "@/components/site/InquiryForm";
 
 export const dynamic = "force-dynamic";
 
@@ -432,6 +433,27 @@ export default async function JournalPostPage({ params }: { params: Promise<{ sl
           </div>
         </section>
       )}
+
+      {/* End-of-post enquiry form - every journal post is a lead-gen page,
+          not just a read, so the contact form sits inline rather than
+          behind a link to /contact. */}
+      <section className="bg-bg-primary py-24 md:py-32 border-t border-white/5 relative">
+        <div className="bg-pattern absolute inset-0 opacity-10 pointer-events-none" />
+        <div className="max-content relative z-10">
+          <div className="flex flex-col items-center text-center max-w-4xl mx-auto space-y-8">
+            <span className="text-medsol-gold text-[11px] tracking-[0.5em] uppercase">Talk To Us</span>
+            <h2 className="text-4xl md:text-6xl font-serif italic text-white">
+              Questions About <br /> <span className="not-italic text-medsol-blue">Life in Murcia?</span>
+            </h2>
+            <p className="text-text-secondary text-lg leading-relaxed font-light max-w-2xl">
+              I&apos;d love to show you the resorts for yourself. Send a message and I&apos;ll get straight back to you.
+            </p>
+            <div className="w-full max-w-2xl pt-6">
+              <InquiryForm variant="contact" showCollectionSelect inquiryType="General" />
+            </div>
+          </div>
+        </div>
+      </section>
 
       <Footer tagline="MEDSOL · Journal." />
     </main>

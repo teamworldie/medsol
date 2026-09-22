@@ -25,6 +25,43 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  // 301s for blog posts that were rewritten at a new URL and had their old
+  // post unpublished, per the client's "Positive rewrites" publishing plan -
+  // keeps any existing search ranking pointed at the replacement post.
+  async redirects() {
+    return [
+      {
+        source: "/journal/is-a-murcia-golf-resort-dead-in-winter-an-honest-answer",
+        destination: "/journal/winter-golf-in-murcia-october-to-may",
+        permanent: true,
+      },
+      {
+        source: "/journal/how-hot-does-murcia-get-and-does-it-flood-an-honest-2026-climate-guide",
+        destination: "/journal/murcia-weather-month-by-month",
+        permanent: true,
+      },
+      {
+        source: "/journal/mar-menor-and-property-values-what-the-data-actually-shows",
+        destination: "/journal/best-beaches-near-murcia-golf-resorts",
+        permanent: true,
+      },
+      {
+        source: "/journal/off-plan-bank-guarantees-in-spain-how-to-protect-your-deposit-ley-57-68",
+        destination: "/journal/off-plan-bank-guarantees-in-spain-how-your-deposit-is-protected",
+        permanent: true,
+      },
+      {
+        source: "/journal/how-to-tell-whether-your-spanish-lawyer-is-actually-independent",
+        destination: "/journal/how-to-choose-a-spanish-property-lawyer",
+        permanent: true,
+      },
+      {
+        source: "/journal/buying-a-resale-on-a-murcia-resort-the-debts-that-follow-the-property",
+        destination: "/journal/why-buy-a-new-build-home-in-murcia",
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     return [
       {

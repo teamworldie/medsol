@@ -8,6 +8,7 @@ import { ArrowRight, MapPin, Wind, Sun, Shield, Settings, Heart, Waves } from "l
 import { cn } from "@/lib/utils";
 import InquiryForm from "@/components/site/InquiryForm";
 import Footer from "@/components/site/Footer";
+import { GUIDES } from "@/lib/guides";
 
 const MotionImage = motion.create(Image);
 
@@ -285,6 +286,35 @@ export default function Home() {
                   </div>
                 </Link>
               </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FREE GUIDES (lead magnets) */}
+      <section className="bg-section-light py-24 md:py-32 text-section-light-text">
+        <div className="max-content">
+          <div className="text-center mb-16 space-y-4">
+            <span className="text-medsol-blue text-[11px] tracking-[0.5em] uppercase font-bold">Free Guides</span>
+            <h2 className="text-4xl md:text-6xl font-serif italic">Plan Your Move.</h2>
+          </div>
+          <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+            {Object.values(GUIDES).map((guide) => (
+              <Link
+                key={guide.slug}
+                href={`/guides/${guide.slug}`}
+                className="group flex flex-col sm:flex-row gap-6 items-center bg-white border border-black/10 p-6 hover:border-medsol-gold transition-colors"
+              >
+                <div className="relative w-full sm:w-40 shrink-0 aspect-video overflow-hidden">
+                  <Image src={guide.cover} alt={guide.title} fill sizes="160px" className="object-cover" />
+                </div>
+                <div className="space-y-2 text-center sm:text-left">
+                  <h3 className="text-lg font-serif leading-snug">{guide.title}</h3>
+                  <span className="text-medsol-blue text-[10px] tracking-[0.3em] uppercase font-bold inline-flex items-center gap-2">
+                    Download free <ArrowRight className="w-3 h-3 transition-transform group-hover:translate-x-1" />
+                  </span>
+                </div>
+              </Link>
             ))}
           </div>
         </div>

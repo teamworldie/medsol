@@ -11,6 +11,8 @@ import { SPAIN_TZ } from "@/lib/timezone";
 import Footer from "@/components/site/Footer";
 import ShareBar from "@/components/site/ShareBar";
 import InquiryForm from "@/components/site/InquiryForm";
+import GuideCta from "@/components/site/GuideCta";
+import { getGuideForPost } from "@/lib/guides";
 
 export const dynamic = "force-dynamic";
 
@@ -392,6 +394,8 @@ export default async function JournalPostPage({ params }: { params: Promise<{ sl
 
           {/* End-of-post author box - expanded E-E-A-T signal per the GEO/AEO
               plan. Always shown, same default byline as the top. */}
+          <GuideCta guide={getGuideForPost(post.slug, post.category)} />
+
           <div className="mt-16 pt-8 border-t border-gray-200 flex items-center gap-5">
             <AuthorAvatar src={post.authorAvatar} name={author} size="lg" />
             <div>

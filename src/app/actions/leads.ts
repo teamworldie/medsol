@@ -29,6 +29,7 @@ type NewLeadSummary = {
   phone: string | null;
   source: string | null;
   inquiryType: string | null;
+  timeline?: string | null;
   notes: string | null;
 };
 
@@ -56,6 +57,7 @@ async function sendLeadNotificationEmail(lead: NewLeadSummary) {
           ${lead.phone ? `<li><strong>Phone:</strong> ${escapeHtml(lead.phone)}</li>` : ""}
           ${lead.source ? `<li><strong>Source:</strong> ${escapeHtml(lead.source)}</li>` : ""}
           ${lead.inquiryType ? `<li><strong>Inquiry Type:</strong> ${escapeHtml(lead.inquiryType)}</li>` : ""}
+          ${lead.timeline ? `<li><strong>Timeline:</strong> ${escapeHtml(lead.timeline)}</li>` : ""}
         </ul>
         ${lead.notes ? `<p><strong>Message:</strong><br>${escapeHtml(lead.notes)}</p>` : ""}
         <p><a href="https://medsol-crm.vercel.app/admin/leads">View in the admin dashboard</a></p>
@@ -87,6 +89,7 @@ export async function submitLead(prevState: unknown, formData: FormData) {
     const inquiryType = formData.get("inquiryType") as string | null;
     const source = (formData.get("source") as string) || "CONTACT_FORM";
     const propertyId = formData.get("propertyId") as string | null;
+    const timeline = ((formData.get("timeline") as string) || "").slice(0, 100) || null;
 
     if (!name || !email || !EMAIL_RE.test(email)) {
       return { success: false, error: "Please enter a valid name and email address." };
@@ -110,6 +113,7 @@ export async function submitLead(prevState: unknown, formData: FormData) {
           phone: phone || null,
           source,
           inquiryType: inquiryType || null,
+          timeline,
           propertyId,
           notes: message || null,
           status: "NEW",
@@ -122,7 +126,7 @@ export async function submitLead(prevState: unknown, formData: FormData) {
           data: { leadId: lead.id, content: message, source: "CONTACT_FORM" },
         });
       }
-      await sendLeadNotificationEmail({ name, email, phone: phone || null, source, inquiryType, notes: message || null });
+      await sendLeadNotificationEmail({ name, email, phone: phone || null, source, inquiryType, timeline, notes: message || null });
     } catch (e) {
       console.error("Prisma failed to save lead on Vercel preview:", e);
       // We simulate success on Vercel previews so the user sees the success state

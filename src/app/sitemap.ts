@@ -11,6 +11,7 @@ const STATIC_PATHS = [
   "/corvera",
   "/santa-rosalia",
   "/journal",
+  "/insider",
   "/guides/buyers-guide",
   "/guides/golf-home-guide",
   "/contact",

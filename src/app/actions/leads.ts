@@ -104,9 +104,12 @@ export async function submitLead(prevState: unknown, formData: FormData) {
       return { success: false, error: "One of the fields is too long. Please shorten your message and try again." };
     }
 
-    // In a Vercel preview with ephemeral SQLite, this might fail, so we wrap it in a try/catch
+    // The lead must really be saved before we report success: this also gates
+    // the guide download, so a silent DB failure would hand out the PDF with
+    // no record of who asked for it.
+    let lead;
     try {
-      const lead = await prisma.lead.create({
+      lead = await prisma.lead.create({
         data: {
           name,
           email,
@@ -119,18 +122,24 @@ export async function submitLead(prevState: unknown, formData: FormData) {
           status: "NEW",
         },
       });
-      // Mirror the inquiry into Message so it shows up in the admin Messages
-      // inbox and in this lead's conversation history, not just as a notes field.
+    } catch (e) {
+      console.error("Failed to save lead:", e);
+      return { success: false, error: "Something went wrong saving your details. Please try again, or email info@medsolrealestate.com." };
+    }
+
+    // Mirror the inquiry into Message so it shows up in the admin Messages
+    // inbox and in this lead's conversation history, not just as a notes field.
+    // Secondary to the lead itself, so a failure here is logged, not surfaced.
+    try {
       if (message) {
         await prisma.message.create({
           data: { leadId: lead.id, content: message, source: "CONTACT_FORM" },
         });
       }
-      await sendLeadNotificationEmail({ name, email, phone: phone || null, source, inquiryType, timeline, notes: message || null });
     } catch (e) {
-      console.error("Prisma failed to save lead on Vercel preview:", e);
-      // We simulate success on Vercel previews so the user sees the success state
+      console.error("Failed to save lead message:", e);
     }
+    await sendLeadNotificationEmail({ name, email, phone: phone || null, source, inquiryType, timeline, notes: message || null });
 
     return { success: true, message: "Thank you for your inquiry. We will be in touch shortly." };
   } catch (error) {

@@ -13,6 +13,7 @@ const links = [
   { href: "/alhama-nature", label: "ALHAMA" },
   { href: "/corvera", label: "CORVERA" },
   { href: "/santa-rosalia", label: "ROSALIA" },
+  { href: "/serena-breeze", label: "SERENA" },
   { href: "/journal", label: "JOURNAL" },
   { href: "/contact", label: "CONTACT" },
 ];
@@ -55,7 +56,7 @@ export default function Navbar() {
     <>
       <nav
         className={cn(
-          "fixed top-0 left-0 w-full z-50 transition-all duration-700 px-8 md:px-16 py-6 md:py-8 flex justify-between items-center",
+          "fixed top-0 left-0 w-full z-50 transition-all duration-700 px-8 md:px-10 xl:px-16 py-6 md:py-8 flex justify-between items-center",
           solidNav ? "bg-bg-primary/90 backdrop-blur-md py-4 md:py-5 border-b border-white/5" : "bg-transparent"
         )}
       >
@@ -70,7 +71,7 @@ export default function Navbar() {
           />
         </Link>
 
-        <div className="hidden lg:flex items-center gap-12">
+        <div className="hidden lg:flex items-center gap-6 xl:gap-12">
           {links.map((link) => (
             <Link
               key={link.href}

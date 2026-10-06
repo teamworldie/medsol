@@ -10,6 +10,7 @@ const STATIC_PATHS = [
   "/alhama-nature",
   "/corvera",
   "/santa-rosalia",
+  "/serena-breeze",
   "/journal",
   "/insider",
   "/guides/buyers-guide",

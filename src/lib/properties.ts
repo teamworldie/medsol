@@ -7,6 +7,7 @@ export const COMMUNITIES = {
   alhama: "Alhama Nature",
   corvera: "Corvera Hills",
   santaRosalia: "Santa Rosalia Lake and Life Resort",
+  serena: "Serena Breeze at Serena Golf",
 } as const;
 
 export function getGallery(property: Property): string[] {

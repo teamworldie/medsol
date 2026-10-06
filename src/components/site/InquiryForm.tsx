@@ -64,6 +64,7 @@ export default function InquiryForm({
                 <option value="Alhama" className="bg-bg-secondary text-white">Alhama Nature</option>
                 <option value="Corvera" className="bg-bg-secondary text-white">Corvera Hills</option>
                 <option value="Santa Rosalia" className="bg-bg-secondary text-white">Santa Rosalia Lake &amp; Life</option>
+                <option value="Serena Breeze" className="bg-bg-secondary text-white">Serena Breeze, Los Alc&aacute;zares</option>
                 <option value="General" className="bg-bg-secondary text-white">General Information</option>
               </select>
             </div>

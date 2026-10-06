@@ -86,14 +86,18 @@ export default function VillaDetailView({
                   <span className="text-[10px] tracking-[0.2em] uppercase text-text-secondary">Bathrooms</span>
                   <p className="text-2xl font-serif text-white">{property.bathrooms}</p>
                 </div>
-                <div className="space-y-2">
-                  <span className="text-[10px] tracking-[0.2em] uppercase text-text-secondary">Build Size</span>
-                  <p className="text-2xl font-serif text-white">{property.area}</p>
-                </div>
-                <div className="space-y-2">
-                  <span className="text-[10px] tracking-[0.2em] uppercase text-text-secondary">Plot Size</span>
-                  <p className="text-2xl font-serif text-white">{property.landArea}</p>
-                </div>
+                {property.area && (
+                  <div className="space-y-2">
+                    <span className="text-[10px] tracking-[0.2em] uppercase text-text-secondary">Build Size</span>
+                    <p className="text-2xl font-serif text-white">{property.area}</p>
+                  </div>
+                )}
+                {property.landArea && (
+                  <div className="space-y-2">
+                    <span className="text-[10px] tracking-[0.2em] uppercase text-text-secondary">Plot Size</span>
+                    <p className="text-2xl font-serif text-white">{property.landArea}</p>
+                  </div>
+                )}
               </div>
               <div className="pt-8 border-t border-white/10 flex flex-col sm:flex-row gap-8 justify-between items-start sm:items-center relative z-10">
                 <div>

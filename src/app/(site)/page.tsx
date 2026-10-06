@@ -81,6 +81,23 @@ const collections = {
     image: "/assets/images/Santa-Rosalia/santa-rosalia-lagoon-view.jpg",
     featured: "Romero 17 Villas",
   },
+  serena: {
+    heading: (
+      <>
+        <span>Golf, Beach</span> <br /> <span className="text-medsol-gold-soft">& Town on Foot.</span>
+      </>
+    ),
+    description:
+      "Serena Breeze brings 37 new 2 and 3-bedroom apartments with generous terraces to Serena Golf in Los Alcázares, a lively Mar Menor beach town you can walk to from the resort. The course was designed by former Ryder Cup player Manuel Piñero.",
+    stats: [
+      { label: "Pricing", value: "319.000€ - 459.000€" },
+      { label: "Apartments", value: "37 · 2 & 3 Bed" },
+      { label: "Bathrooms", value: "2" },
+      { label: "Location", value: "Walk to Beach & Town" },
+    ],
+    image: "/assets/images/Serena-Breeze/serena-breeze-golf-view-2.jpg",
+    featured: "Serena Breeze Apartments",
+  },
 };
 
 // Path/short-label lookup so a new collection only needs one entry here,
@@ -90,6 +107,7 @@ const communityPaths: Record<keyof typeof collections, { href: string; label: st
   alhama: { href: "/alhama-nature", label: "Alhama" },
   corvera: { href: "/corvera", label: "Corvera" },
   santaRosalia: { href: "/santa-rosalia", label: "Santa Rosalia" },
+  serena: { href: "/serena-breeze", label: "Serena Breeze" },
 };
 
 export default function Home() {
@@ -125,6 +143,9 @@ export default function Home() {
               </Link>
               <Link href="/santa-rosalia" className="group flex items-center gap-4 text-[11px] tracking-[0.3em] uppercase bg-medsol-blue px-10 py-5 hover:bg-medsol-blue-light transition-all duration-500">
                 Santa Rosalia <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </Link>
+              <Link href="/serena-breeze" className="group flex items-center gap-4 text-[11px] tracking-[0.3em] uppercase bg-medsol-blue px-10 py-5 hover:bg-medsol-blue-light transition-all duration-500">
+                Serena Breeze <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Link>
             </div>
           </motion.div>
@@ -205,6 +226,7 @@ export default function Home() {
                   <button onClick={() => setActiveCollection("alhama")} className={cn("text-[10px] tracking-[0.3em] uppercase font-bold pb-4 transition-colors whitespace-nowrap", activeCollection === "alhama" ? "text-medsol-gold" : "text-text-secondary hover:text-medsol-gold")}>Alhama</button>
                   <button onClick={() => setActiveCollection("corvera")} className={cn("text-[10px] tracking-[0.3em] uppercase font-bold pb-4 transition-colors whitespace-nowrap", activeCollection === "corvera" ? "text-medsol-gold" : "text-text-secondary hover:text-medsol-gold")}>Corvera</button>
                   <button onClick={() => setActiveCollection("santaRosalia")} className={cn("text-[10px] tracking-[0.3em] uppercase font-bold pb-4 transition-colors whitespace-nowrap", activeCollection === "santaRosalia" ? "text-medsol-gold" : "text-text-secondary hover:text-medsol-gold")}>Santa Rosalia</button>
+                  <button onClick={() => setActiveCollection("serena")} className={cn("text-[10px] tracking-[0.3em] uppercase font-bold pb-4 transition-colors whitespace-nowrap", activeCollection === "serena" ? "text-medsol-gold" : "text-text-secondary hover:text-medsol-gold")}>Serena Breeze</button>
                 </div>
                 <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif leading-tight">{collection.heading}</h2>
               </div>
@@ -411,6 +433,30 @@ export default function Home() {
             </p>
             <Link href="/santa-rosalia" className="inline-flex py-4 px-12 bg-[#D6B06A] text-bg-primary text-[11px] tracking-[0.3em] uppercase hover:bg-white transition-all font-bold">
               Explore Santa Rosalia
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* 6.7 SERENA BREEZE FEATURE SECTION */}
+      <section className="relative h-[85vh] w-full flex items-center overflow-hidden">
+        <div className="absolute inset-0 z-0 scale-105">
+          <Image src="/assets/images/Serena-Golf/serena-golf-main.jpg" fill sizes="100vw" className="object-cover" alt="Serena Golf, Los Alcázares" />
+          <div className="absolute inset-0 bg-[#0a0e17]/85 md:hidden" />
+          <div className="absolute inset-0 bg-medsol-blue/40 mix-blend-multiply hidden md:block" />
+          <div className="absolute inset-0 bg-gradient-to-r from-bg-primary via-bg-primary/40 to-transparent hidden md:block" />
+        </div>
+        <div className="max-content relative z-10">
+          <div className="max-w-4xl space-y-10">
+            <span className="text-medsol-gold text-[12px] tracking-[0.5em] uppercase">Serena Breeze · Los Alcázares</span>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-serif italic leading-none">
+              Golf, Beach <br /> &amp; Town on Foot.
+            </h2>
+            <p className="text-text-secondary text-lg leading-relaxed font-light">
+              Thirty-seven new apartments with generous terraces on the Serena Golf course, a short walk from the centre and beaches of Los Alcázares.
+            </p>
+            <Link href="/serena-breeze" className="inline-flex py-4 px-12 bg-[#D6B06A] text-bg-primary text-[11px] tracking-[0.3em] uppercase hover:bg-white transition-all font-bold">
+              Explore Serena Breeze
             </Link>
           </div>
         </div>

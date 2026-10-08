@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import Navbar from "@/components/site/Navbar";
 import PageTransition from "@/components/site/PageTransition";
 import CookieConsent from "@/components/site/CookieConsent";
-import { SITE_NAME, SITE_URL } from "@/lib/siteConfig";
+import { SITE_NAME, SITE_URL, SOCIAL_PROFILES } from "@/lib/siteConfig";
 
 const organizationJsonLd = {
   "@context": "https://schema.org",
@@ -16,6 +16,7 @@ const organizationJsonLd = {
     "@type": "AdministrativeArea",
     name: "Murcia, Spain",
   },
+  sameAs: SOCIAL_PROFILES.map((p) => p.url),
 };
 
 export const viewport: Viewport = {
@@ -48,11 +49,9 @@ export const metadata: Metadata = {
   robots: "index, follow",
   alternates: {
     canonical: `${SITE_URL}/`,
-    languages: {
-      es: `${SITE_URL}/es/`,
-      en: `${SITE_URL}/`,
-      "x-default": `${SITE_URL}/`,
-    },
+    // No hreflang alternates: there is no Spanish (/es/) version of the
+    // site, and pointing Google at one produced a 404 in Search Console.
+    // Re-add `languages` only once translated pages actually exist.
   },
   openGraph: {
     type: "website",

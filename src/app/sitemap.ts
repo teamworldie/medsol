@@ -24,7 +24,10 @@ const STATIC_PATHS = [
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [properties, posts] = await Promise.all([
     prisma.property.findMany({ where: { slug: { not: null } }, select: { slug: true, updatedAt: true } }),
-    prisma.blogPost.findMany({ where: { publishedAt: { not: null } }, select: { slug: true, updatedAt: true } }),
+    // `lte: now` keeps scheduled (future-dated) posts out of the sitemap -
+    // they 404 on the public site until their publish time, and listing them
+    // early caused "Not found" errors in Search Console.
+    prisma.blogPost.findMany({ where: { publishedAt: { not: null, lte: new Date() } }, select: { slug: true, updatedAt: true } }),
   ]);
 
   const staticEntries: MetadataRoute.Sitemap = STATIC_PATHS.map((path) => ({

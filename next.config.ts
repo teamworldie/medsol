@@ -60,6 +60,18 @@ const nextConfig: NextConfig = {
         destination: "/journal/why-buy-a-new-build-home-in-murcia",
         permanent: true,
       },
+      // There is no Spanish version of the site. An old hreflang link sent
+      // Google to /es/, which 404'd; send it (and anything under it) home.
+      {
+        source: "/es",
+        destination: "/",
+        permanent: true,
+      },
+      {
+        source: "/es/:path*",
+        destination: "/",
+        permanent: true,
+      },
     ];
   },
   async headers() {

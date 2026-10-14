@@ -56,12 +56,20 @@ export default async function BlogPage({
           <h1 className="text-2xl font-bold text-gray-900">Blog Posts</h1>
           <p className="text-gray-500 mt-1">Manage articles published to the public site.</p>
         </div>
+        <div className="flex items-center gap-3">
+        <Link
+          href="/admin/blog/performance"
+          className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+        >
+          Performance
+        </Link>
         <Link
           href="/admin/blog/new"
           className="rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 transition-colors"
         >
           Add Post
         </Link>
+        </div>
       </div>
 
       <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">

@@ -13,6 +13,7 @@ export default function InquiryForm({
   variant,
   propertyId,
   inquiryType,
+  sourcePage,
   showCollectionSelect = false,
   buttonLabel = "Send Inquiry",
   buttonClassName = "block text-center w-full py-6 bg-medsol-blue text-white text-[11px] tracking-[0.4em] uppercase font-bold hover:bg-medsol-gold transition-all duration-700 disabled:opacity-50",
@@ -20,6 +21,7 @@ export default function InquiryForm({
   variant: "contact" | "villa";
   propertyId?: string;
   inquiryType?: string;
+  sourcePage?: string;
   showCollectionSelect?: boolean;
   buttonLabel?: string;
   buttonClassName?: string;
@@ -38,6 +40,7 @@ export default function InquiryForm({
     <form action={formAction} className="space-y-10">
       {propertyId && <input type="hidden" name="propertyId" value={propertyId} />}
       {inquiryType && <input type="hidden" name="inquiryType" value={inquiryType} />}
+      {sourcePage && <input type="hidden" name="sourcePage" value={sourcePage} />}
       <input type="text" name="company_website" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden="true" />
 
       {variant === "contact" ? (

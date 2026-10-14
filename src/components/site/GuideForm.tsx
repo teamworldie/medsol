@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useRef } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import { submitGuideLead, type GuideFormState } from "@/app/actions/guideLead";
 import type { Guide } from "@/lib/guides";
 
@@ -15,6 +15,11 @@ const TIMELINES = ["Within 3 months", "3–6 months", "6–12 months", "Over 12 
 export default function GuideForm({ guide }: { guide: Guide }) {
   const [state, formAction, isPending] = useActionState(submitGuideLead, initialState);
   const link = useRef<HTMLAnchorElement>(null);
+  // The blog post that sent the visitor here (?from=/journal/slug), if any.
+  const [sourcePage, setSourcePage] = useState("");
+  useEffect(() => {
+    setSourcePage(new URLSearchParams(window.location.search).get("from") ?? "");
+  }, []);
 
   // Start the download as soon as the lead is saved; the button below is the
   // fallback if the browser blocks the automatic one.
@@ -49,6 +54,7 @@ export default function GuideForm({ guide }: { guide: Guide }) {
   return (
     <form action={formAction} className="space-y-8">
       <input type="hidden" name="guide" value={guide.slug} />
+      <input type="hidden" name="sourcePage" value={sourcePage} />
       <input type="text" name="company_website" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden="true" />
 
       <div className="space-y-2 group">

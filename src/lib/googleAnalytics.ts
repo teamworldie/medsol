@@ -69,3 +69,71 @@ export async function getTrafficSummary(days = 30): Promise<TrafficSummary | nul
 
   return { users, sessions, pageViews, topPages };
 }
+
+export type BlogPostTraffic = {
+  path: string; // e.g. /journal/some-slug
+  views: number;
+  users: number;
+  avgEngagementSeconds: number;
+  organicSessions: number;
+};
+
+// Per-article traffic for every /journal/<slug> page in the range. Returns
+// null when GA4 isn't configured (same contract as getTrafficSummary).
+export async function getBlogPostTraffic(days = 30): Promise<BlogPostTraffic[] | null> {
+  const propertyId = process.env.GA4_PROPERTY_ID;
+  if (!propertyId || !process.env.GOOGLE_ANALYTICS_CLIENT_EMAIL || !process.env.GOOGLE_ANALYTICS_PRIVATE_KEY) {
+    return null;
+  }
+
+  const client = getAnalyticsClient();
+  const property = `properties/${propertyId}`;
+  const dateRanges = [{ startDate: `${days}daysAgo`, endDate: "today" }];
+  const onlyPosts = {
+    filter: { fieldName: "pagePath", stringFilter: { matchType: "BEGINS_WITH" as const, value: "/journal/" } },
+  };
+
+  const [main] = await client.runReport({
+    property,
+    dateRanges,
+    dimensions: [{ name: "pagePath" }],
+    metrics: [{ name: "screenPageViews" }, { name: "activeUsers" }, { name: "userEngagementDuration" }],
+    dimensionFilter: onlyPosts,
+    orderBys: [{ metric: { metricName: "screenPageViews" }, desc: true }],
+    limit: 500,
+  });
+
+  const [organic] = await client.runReport({
+    property,
+    dateRanges,
+    dimensions: [{ name: "pagePath" }],
+    metrics: [{ name: "sessions" }],
+    dimensionFilter: {
+      andGroup: {
+        expressions: [
+          onlyPosts,
+          { filter: { fieldName: "sessionDefaultChannelGroup", stringFilter: { matchType: "EXACT" as const, value: "Organic Search" } } },
+        ],
+      },
+    },
+    limit: 500,
+  });
+
+  const organicByPath = new Map<string, number>();
+  for (const row of organic.rows ?? []) {
+    organicByPath.set(row.dimensionValues?.[0]?.value ?? "", Number(row.metricValues?.[0]?.value ?? 0));
+  }
+
+  return (main.rows ?? []).map((row) => {
+    const path = (row.dimensionValues?.[0]?.value ?? "").replace(/\/+$/, "");
+    const users = Number(row.metricValues?.[1]?.value ?? 0);
+    const engagement = Number(row.metricValues?.[2]?.value ?? 0);
+    return {
+      path,
+      views: Number(row.metricValues?.[0]?.value ?? 0),
+      users,
+      avgEngagementSeconds: users > 0 ? engagement / users : 0,
+      organicSessions: organicByPath.get(row.dimensionValues?.[0]?.value ?? "") ?? 0,
+    };
+  });
+}

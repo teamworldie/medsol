@@ -85,7 +85,7 @@ export async function submitLead(prevState: unknown, formData: FormData) {
     const name = formData.get("name") as string;
     const email = formData.get("email") as string;
     const phone = formData.get("phone") as string;
-    const message = formData.get("message") as string;
+    let message = formData.get("message") as string;
     const inquiryType = formData.get("inquiryType") as string | null;
     const source = (formData.get("source") as string) || "CONTACT_FORM";
     const propertyId = formData.get("propertyId") as string | null;
@@ -102,6 +102,14 @@ export async function submitLead(prevState: unknown, formData: FormData) {
       (message && message.length > MAX_LENGTHS.message)
     ) {
       return { success: false, error: "One of the fields is too long. Please shorten your message and try again." };
+    }
+
+    // Which page the visitor was on (e.g. /journal/<slug>), so blog posts can
+    // be credited with the enquiries they generate. Stored as a trailing line
+    // in the note/message rather than a new column, so no schema change.
+    const sourcePage = ((formData.get("sourcePage") as string) || "").trim();
+    if (/^\/[A-Za-z0-9\-_/]{1,200}$/.test(sourcePage)) {
+      message = `${message || ""}${message ? "\n\n" : ""}Source page: ${sourcePage}`;
     }
 
     // The lead must really be saved before we report success: this also gates

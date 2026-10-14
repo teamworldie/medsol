@@ -394,7 +394,7 @@ export default async function JournalPostPage({ params }: { params: Promise<{ sl
 
           {/* End-of-post author box - expanded E-E-A-T signal per the GEO/AEO
               plan. Always shown, same default byline as the top. */}
-          <GuideCta guide={getGuideForPost(post.slug, post.category)} />
+          <GuideCta guide={getGuideForPost(post.slug, post.category)} fromPath={`/journal/${post.slug}`} />
 
           <div className="mt-16 pt-8 border-t border-gray-200 flex items-center gap-5">
             <AuthorAvatar src={post.authorAvatar} name={author} size="lg" />
@@ -453,7 +453,7 @@ export default async function JournalPostPage({ params }: { params: Promise<{ sl
               I&apos;d love to show you the resorts for yourself. Send a message and I&apos;ll get straight back to you.
             </p>
             <div className="w-full max-w-2xl pt-6">
-              <InquiryForm variant="contact" showCollectionSelect inquiryType="General" />
+              <InquiryForm variant="contact" showCollectionSelect inquiryType="General" sourcePage={`/journal/${post.slug}`} />
             </div>
           </div>
         </div>

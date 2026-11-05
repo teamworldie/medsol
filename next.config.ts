@@ -11,6 +11,11 @@ const nextConfig: NextConfig = {
     root: __dirname,
   },
   images: {
+    // Vercel's image optimiser started answering every /_next/image request
+    // with 402 "OPTIMIZED_IMAGE_REQUEST_PAYMENT_REQUIRED" (plan quota used up),
+    // which broke every image on the site. Serve the files as-is instead; the
+    // source images are already web-sized (none over ~1MB).
+    unoptimized: true,
     remotePatterns: [
       // Add any external image hosts your property photos/media live on.
       // Supabase Storage is included by default since this template uses it
